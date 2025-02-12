@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQLite Viewer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>SQLite Database Viewer</h1>
+  <button id="load-db">Load Database</button>
+  <div id="tables"></div>
+
+  <script>
+    document.getElementById("load-db").addEventListener("click", async () => {
+      const dbPath = "database/h2-scenarios.sqlite"; // Path to database
+
+      console.log("Initializing sql.js...");
+      try {
+        const SQL = await initSqlJs({
+          locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
+        });
+        console.log("sql.js loaded successfully.");
+
+        console.log(`Fetching database from: ${dbPath}`);
+        const response = await fetch(dbPath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch database: ${response.statusText}`);
+        }
+        const buffer = await response.arrayBuffer();
+        console.log("Database file loaded successfully.");
+
+        // Load the database
+        const db = new SQL.Database(new Uint8Array(buffer));
+        console.log("Database initialized.");
+
+        // Get all tables
+        const tablesResult = db.exec(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`);
+        const tables = tablesResult[0]?.values.map(row => row[0]) || [];
+
+        console.log("Tables found:", tables);
+        const tablesDiv = document.getElementById("tables");
+        tablesDiv.innerHTML = ""; // Clear previous results
+
+        if (tables.length === 0) {
+          tablesDiv.innerHTML = "<p>No tables found in the database.</p>";
+          console.warn("No tables found.");
+          return;
+        }
+
+        tables.forEach(tableName => {
+          console.log(`Fetching data from table: ${tableName}`);
+          const result = db.exec(`SELECT * FROM ${tableName}`);
+
+          if (result.length > 0) {
+            const columns = result[0].columns;
+            const values = result[0].values;
+
+            // Create table element
+            const table = document.createElement("table");
+            const thead = document.createElement("thead");
+            const tbody = document.createElement("tbody");
+
+            // Header row
+            const headerRow = document.createElement("tr");
+            columns.forEach(column => {
+              const th = document.createElement("th");
+              th.textContent = column;
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            // Data rows
+            values.forEach(row => {
+              const dataRow = document.createElement("tr");
+              row.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                dataRow.appendChild(td);
+              });
+              tbody.appendChild(dataRow);
+            });
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+
+            // Add table to the page
+            const container = document.createElement("div");
+            const title = document.createElement("h2");
+            title.textContent = `Table: ${tableName}`;
+            container.appendChild(title);
+            container.appendChild(table);
+
+            tablesDiv.appendChild(container);
+          } else {
+            console.warn(`No data found in table: ${tableName}`);
+          }
+        });
+
+      } catch (error) {
+        console.error("Error loading database:", error);
+        alert(`Failed to load the database: ${error.message}`);
+      }
+    });
+  </script>
+</body>
+</html>

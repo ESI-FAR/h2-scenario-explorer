@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2 scenario explorer</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- OpenLayers CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css">
+    <!-- SQLite API -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+    <style>
+        /* Reduce the header height */
+        header {
+            padding: 10px 0;
+        }
+
+        /* Logo size adjustment */
+        .logo {
+            height: 50px;
+        }
+
+        /* Set the map height */
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Icon size */
+        .icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        /* Spacing for toggles */
+        .form-check {
+            margin-bottom: 10px;
+        }
+   
+    
+        .table {
+            font-size: 0.85rem;
+        }
+
+        .table th, .table td {
+            text-align: center;
+        }
+    </style>
+
+
+
+</head>
+<body>
+
+    <!-- Header with Logo -->
+    <header class="text-white" style="background-color: #009DDD;">
+        <div class="container d-flex align-items-center justify-content-between">
+            <!-- Logo on the Left -->
+            <div>
+                <img src="assets/escience_favicon.png" alt="Logo" class="logo">
+            </div>
+            
+            <!-- Header Text -->
+            <div class="text-end">
+                <h1 class="h4 mb-0">H<sub>2</sub> Production</h1>
+                <p class="mb-0">scenario explorer</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- First Section: Two Equal Columns -->
+    <section class="container my-5">
+        <div class="row">
+            <!-- Left Column with Toggles and Sliders -->
+            <div class="col-md-6">
+                <div class="p-4 bg-white border">
+                    <h5>System Configuration</h5>
+
+                    <!-- Add this CSS in the <head> section or a <style> tag -->
+                    <style>
+                        .icon {
+                            width: 100px;      /* Increase icon size */
+                            margin-right: 15px; /* Increase space between the icon and radio button */
+                        }
+
+                        .form-check {
+                            margin-bottom: 20px; /* Optional: add spacing between each radio button group */
+                        }
+                    </style>
+
+                    <!-- Three Vertical Radio Buttons with Enlarged Icons and Increased Spacing -->
+                    <div class="mb-4">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config1">
+                            <img src="assets/icon_1.png" alt="Icon 1" class="icon">
+                            <label class="form-check-label" for="config1"><small>Onshore centralized electrolysis</small></label>
+                        </div>
+
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config2">
+                            <img src="assets/icon_2.png" alt="Icon 2" class="icon">
+                            <label class="form-check-label" for="config2"><small>Offshore centralized electrolysis</small></label>
+                        </div>
+
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config3">
+                            <img src="assets/icon_3.png" alt="Icon 3" class="icon">
+                            <label class="form-check-label" for="config3"><small>Offshore decentralized electrolysis</small></label>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Two Horizontal Toggles with Icons -->
+                    <h5>Electrolyzer Type</h5>
+                    <div class="d-flex justify-content-start mb-4">
+                        <div class="form-check d-flex align-items-center me-3">
+                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="alk" >
+                            <label class="form-check-label" for="alk"><small>ALK</small></label>
+                        </div>
+
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="pem">
+                            <label class="form-check-label" for="pem"><small>PEM</small></label>
+                        </div>
+                    </div>
+
+                   <!-- Two Stepped Vertical Sliders with Tick Marks -->
+                    <h5>Parameters</h5>
+
+                    <!-- Slider 1: Electrolyzed Efficiency -->
+                    <div class="mb-3">
+                        <label for="parameter1" class="form-label">Electrolyzed Efficiency (%)</label>
+                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter1" list="efficiencyTicks">
+                        <datalist id="efficiencyTicks">
+                            <!-- Tick Marks at Low, Medium, High -->
+                            <option value="0" label="Low"></option>
+                            <option value="50" label="Medium"></option>
+                            <option value="100" label="High"></option>
+                        </datalist>
+                        <div id="value1">Medium</div>
+                    </div>
+                    <!-- Slider 2: Transmission Losses -->
+                    <div>
+                        <label for="parameter2" class="form-label">Transmission Losses (%)</label>
+                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter2" list="lossesTicks">
+                        <datalist id="lossesTicks">
+                            <!-- Tick Marks at Low, Medium, High -->
+                            <option value="0" label="Low"></option>
+                            <option value="50" label="Medium"></option>
+                            <option value="100" label="High"></option>
+                        </datalist>
+                        <div id="value2">Medium</div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Update Electrolyzed Efficiency value
+                const slider1 = document.getElementById('parameter1');
+                const value1 = document.getElementById('value1');
+                slider1.addEventListener('input', function() {
+                    if (slider1.value == 0) {
+                        value1.textContent = 'Low';
+                    } else if (slider1.value == 50) {
+                        value1.textContent = 'Medium';
+                    } else {
+                        value1.textContent = 'High';
+                    }
+                });
+            
+                // Update Transmission Losses value
+                const slider2 = document.getElementById('parameter2');
+                const value2 = document.getElementById('value2');
+                slider2.addEventListener('input', function() {
+                    if (slider2.value == 0) {
+                        value2.textContent = 'Low';
+                    } else if (slider2.value == 50) {
+                        value2.textContent = 'Medium';
+                    } else {
+                        value2.textContent = 'High';
+                    }
+                });
+            </script>
+            
+
+            
+
+            <!-- Right Column with OpenLayers Map -->
+            <div class="col-md-6">
+                <div class="p-4 bg-light border">
+                    <!-- Map Container -->
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+   <!-- Second Section -->
+<section class="container my-5">
+    <div class="p-4 bg-gray text-dark text-center">
+        <h2>Scenarios Section</h2>
+        <p>Click to explore scenarios...</p>
+         <!-- Explore Scenario Button -->
+         <button id="load-db" class="btn btn-primary">Explore Scenario</button>
+
+         <div id="tables"></div>
+
+        <!-- Row for Side-by-Side Charts and Tables -->
+        <div  class="row justify-content-center" >
+            
+            <!-- Histogram Chart and Table Side by Side -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <!-- Histogram Chart -->
+                <div class="me-4">
+                    <h5 class="text-white">Histogram Chart</h5>
+                    <canvas id="histogramChart" class="small-chart"></canvas>
+                </div>
+                
+                <!-- Histogram Table -->
+                <div>
+                    <table class="table table-sm table-bordered table-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>19</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pie Chart and Table Side by Side -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <!-- Pie Chart -->
+                <div class="me-3">
+                    <h5 class="text-white">Pie Chart</h5>
+                    <canvas id="pieChart" class="small-chart"></canvas>
+                </div>
+                
+                <!-- Pie Table -->
+                <div>
+                    <table class="table table-sm table-bordered table-light">
+                        <tr>
+                            <th>Segment</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>Red</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Blue</td>
+                            <td>20</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    document.getElementById("load-db").addEventListener("click", async () => {
+
+        // Retreive user inputs data and validate them ------------------------------------------------------------------------
+
+            // Check system configuration ----------------------------------------------------------
+            checkConfigSelection();
+            checkElectrolyzerSelection();
+            getSliderValues();
+
+            function checkConfigSelection() {
+                // Check if any radio button is selected
+                const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
+                
+                if (!selectedOption) {
+                    // Display an error message if no selection is made
+                    alert("Please select a system configuration.");
+                    exit;
+                } else {
+                    // Proceed with the form submission or other actions
+                    alert("Selection made: " + selectedOption.id);
+                    return selectedOption.id;
+                }
+            }
+
+            function checkElectrolyzerSelection() {
+                // Check if any radio button is selected for electrolyzer type
+                const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
+                
+                if (!selectedOption) {
+                    // Display an error message if no selection is made
+                    alert("Please select an electrolyzer type.");
+                    exit;
+                } else {
+                    // Proceed with the form submission or other actions
+                    alert("Electrolyzer type selected: " + selectedOption.id);
+                }
+            }
+
+            // Function to retrieve the selected values from the sliders
+            function getSliderValues() {
+                const slider1 = document.getElementById('parameter1');
+                const slider2 = document.getElementById('parameter2');
+                
+                // Retrieve the selected values from the sliders
+                const value1 = slider1.value;
+                const value2 = slider2.value;
+
+                // Convert the values to Low, Medium, or High
+                const efficiency = value1 == 0 ? 'Low' : (value1 == 50 ? 'Medium' : 'High');
+                const losses = value2 == 0 ? 'Low' : (value2 == 50 ? 'Medium' : 'High');
+       
+
+                // You can also return or display the values in the UI if needed
+                    alert(`Electrolyzed Efficiency: ${efficiency}\nTransmission Losses: ${losses}`);
+
+                    return efficiency, losses;
+                }
+
+                
+
+        // Run SQL queries accordingly -----------------------------------------------------------------------------------------
+
+
+        // Update Charts and tables ---------------------------------------------------------------------------------------------
+
+
+
+
+      const dbPath = "database/h2-scenarios.sqlite"; // Path to database
+      const rowsPerPage = 20; // Number of rows per page
+      let currentPage = 1; // Track the current page
+      let db; // To store the database object
+      let totalPages = 0; // Total pages in the table
+
+      console.log("Initializing sql.js...");
+      try {
+        const SQL = await initSqlJs({
+          locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
+        });
+        console.log("sql.js loaded successfully.");
+
+        console.log(`Fetching database from: ${dbPath}`);
+        const response = await fetch(dbPath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch database: ${response.statusText}`);
+        }
+        const buffer = await response.arrayBuffer();
+        console.log("Database file loaded successfully.");
+
+        // Load the database
+        db = new SQL.Database(new Uint8Array(buffer));
+        console.log("Database initialized.");
+
+        // Get all tables
+        const tablesResult = db.exec(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`);
+        const tables = tablesResult[0]?.values.map(row => row[0]) || [];
+
+        console.log("Tables found:", tables);
+        const tablesDiv = document.getElementById("tables");
+        tablesDiv.innerHTML = ""; // Clear previous results
+
+        if (tables.length === 0) {
+          tablesDiv.innerHTML = "<p>No tables found in the database.</p>";
+          console.warn("No tables found.");
+          return;
+        }
+
+        // Fetch and display data for each table
+        tables.forEach(tableName => {
+          console.log(`Fetching data from table: ${tableName}`);
+          fetchTableData(tableName, currentPage, rowsPerPage);
+
+          // Fetch the table data and handle pagination
+          async function fetchTableData(tableName, page, limit) {
+            const offset = (page - 1) * limit;
+            const result = db.exec(`SELECT * FROM ${tableName} LIMIT ${limit} OFFSET ${offset}`);
+            const totalRowsResult = db.exec(`SELECT COUNT(*) FROM ${tableName}`);
+            const totalRows = totalRowsResult[0]?.values[0][0] || 0;
+            totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            if (result.length > 0) {
+              const columns = result[0].columns;
+              const values = result[0].values;
+
+              // Create table element
+              const table = document.createElement("table");
+              const thead = document.createElement("thead");
+              const tbody = document.createElement("tbody");
+
+              // Header row
+              const headerRow = document.createElement("tr");
+              columns.forEach(column => {
+                const th = document.createElement("th");
+                th.textContent = column;
+                headerRow.appendChild(th);
+              });
+              thead.appendChild(headerRow);
+
+              // Data rows
+              values.forEach(row => {
+                const dataRow = document.createElement("tr");
+                row.forEach(value => {
+                  const td = document.createElement("td");
+                  td.textContent = value;
+                  dataRow.appendChild(td);
+                });
+                tbody.appendChild(dataRow);
+              });
+
+              table.appendChild(thead);
+              table.appendChild(tbody);
+
+              // Add table to the page
+              const container = document.createElement("div");
+              const title = document.createElement("h2");
+              title.textContent = `Table: ${tableName}`;
+              container.appendChild(title);
+              container.appendChild(table);
+
+              tablesDiv.innerHTML = ""; // Clear previous content
+              tablesDiv.appendChild(container);
+
+              // Create pagination controls
+              createPaginationControls();
+            } else {
+              console.warn(`No data found in table: ${tableName}`);
+            }
+          }
+
+          // Pagination controls with a sliding window for page numbers
+          function createPaginationControls() {
+            const paginationDiv = document.createElement("div");
+            paginationDiv.classList.add("pagination");
+
+            const prevButton = document.createElement("button");
+            prevButton.textContent = "Previous";
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener("click", () => {
+              currentPage--;
+              fetchTableData(tableName, currentPage, rowsPerPage);
+            });
+
+            const nextButton = document.createElement("button");
+            nextButton.textContent = "Next";
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener("click", () => {
+              currentPage++;
+              fetchTableData(tableName, currentPage, rowsPerPage);
+            });
+
+            paginationDiv.appendChild(prevButton);
+
+            // Display only a limited number of page buttons
+            const pageWindow = 5; // Number of pages to show at a time
+            const startPage = Math.max(1, currentPage - Math.floor(pageWindow / 2));
+            const endPage = Math.min(totalPages, startPage + pageWindow - 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+              const pageButton = document.createElement("button");
+              pageButton.classList.add("page-number");
+              pageButton.textContent = i;
+              if (i === currentPage) {
+                pageButton.classList.add("active");
+              }
+              pageButton.addEventListener("click", () => {
+                currentPage = i;
+                fetchTableData(tableName, currentPage, rowsPerPage);
+              });
+              paginationDiv.appendChild(pageButton);
+            }
+
+            paginationDiv.appendChild(nextButton);
+
+            tablesDiv.appendChild(paginationDiv);
+          }
+        });
+      } catch (error) {
+        console.error("Error loading database:", error);
+        alert(`Failed to load the database: ${error.message}`);
+      }
+    });
+  </script>
+
+
+<script src="script/main.js"></script>
+
+<!-- Add Font Awesome CDN in the <head> section if not already included -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Footer -->
+<footer class="text-white text-center py-3" style="background-color: #FFB213;">
+    <p>
+        &copy; <small>2025 H<sub>2</sub> Scenario Explorer. Developed by NL eScience Center, Amsterdam. <br>All rights reserved. Funded by XXX Grant Number YYYY</small>
+    </p>
+    <!-- GitHub Icon Link -->
+    <a href="https://github.com/ESI-FAR/h2-scenario-explorer" target="_blank" style="color: white; font-size: 20px; text-decoration: none;">
+        <i class="fab fa-github"></i>
+    </a>
+</footer>
+
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- OpenLayers JS -->
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
+
+<!-- Initialize OpenLayers Map -->
+<script src="script/map.js"></script>
+
+</body>
+</html>
