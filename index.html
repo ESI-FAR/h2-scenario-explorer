@@ -127,7 +127,8 @@
                             <label class="form-check-label" for="pem"><small>PEM</small></label>
                         </div>
                     </div>
-
+                    
+                    <hr>
                    <!-- Two Stepped Vertical Sliders with Tick Marks -->
                     <h5>Parameters</h5>
 
@@ -155,6 +156,43 @@
                         </datalist>
                         <div id="value2">Average</div>
                     </div>
+
+                    <!-- Switch: Repurposed, new -->
+                     <div>
+                        
+                        <hr>
+                        <h5>Status</h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">
+                                <span id="newText" style="font-weight: bold; color: black;">New</span> /
+                                <span id="repurposedText" style="color: lightgray;">Repurposed</span>
+                            </label> 
+                        </div>
+                        
+                        <script>
+                            document.getElementById("flexSwitchCheckDefault").addEventListener("change", function() {
+                                let newText = document.getElementById("newText");
+                                let repurposedText = document.getElementById("repurposedText");
+                        
+                                if (this.checked) {
+                                    newText.style.fontWeight = "normal";
+                                    newText.style.color = "lightgray";
+                        
+                                    repurposedText.style.fontWeight = "bold";
+                                    repurposedText.style.color = "black";
+                                } else {
+                                    newText.style.fontWeight = "bold";
+                                    newText.style.color = "black";
+                        
+                                    repurposedText.style.fontWeight = "normal";
+                                    repurposedText.style.color = "lightgray";
+                                }
+                            });
+                        </script>
+                        
+                    </div>
+
                 </div>
             </div>
 
@@ -278,82 +316,70 @@
 </section>
 
 <script>
+  document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("load-db").addEventListener("click", async () => {
-
-        // Retreive user inputs data and validate them ------------------------------------------------------------------------
-
-            // Check system configuration ----------------------------------------------------------
-            checkConfigSelection();
-            checkElectrolyzerSelection();
-            getSliderValues();
-
-            function checkConfigSelection() {
-                // Check if any radio button is selected
-                const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
-                
-                if (!selectedOption) {
-                    // Display an error message if no selection is made
-                    alert("Please select a system configuration.");
-                    exit;
-                } else {
-                    // Proceed with the form submission or other actions
-                    alert("Selection made: " + selectedOption.id);
-                    return selectedOption.id;
-                }
-            }
-
-            function checkElectrolyzerSelection() {
-                // Check if any radio button is selected for electrolyzer type
-                const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
-                
-                if (!selectedOption) {
-                    // Display an error message if no selection is made
-                    alert("Please select an electrolyzer type.");
-                    exit;
-                } else {
-                    // Proceed with the form submission or other actions
-                    alert("Electrolyzer type selected: " + selectedOption.id);
-                }
-            }
-
-            // Function to retrieve the selected values from the sliders
-            function getSliderValues() {
-                const slider1 = document.getElementById('parameter1');
-                const slider2 = document.getElementById('parameter2');
-                
-                // Retrieve the selected values from the sliders
-                const value1 = slider1.value;
-                const value2 = slider2.value;
-
-                // Convert the values to Low, Medium, or High
-                const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
-                   value1 == 50 ? 'Average' : 
-                   value1 == 75 ? 'Optimistic' : 
-                   'Expert Validated';
-                const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optmistic');
-       
-
-                // You can also return or display the values in the UI if needed
-                    alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
-
-                    return efficiency, losses;
-                }
-
-                
-
-        // Run SQL queries accordingly -----------------------------------------------------------------------------------------
-
-        const dbPath = "database/h2-scenarios.sqlite"; // Path to database
-
-
-        // Update Charts and tables ---------------------------------------------------------------------------------------------
-
-
-
-
-        
-      
+        // Stop execution if any of these checks fail
+        if (!checkConfigSelection()) return;
+        if (!checkElectrolyzerSelection()) return;
+        getSliderValues();
+        checkSwitchSelection();
     });
+
+    function checkConfigSelection() {
+        const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
+        if (!selectedOption) {
+            alert("Please select a system configuration.");
+            return false; // Stop execution
+        } 
+        alert("Selection made: " + selectedOption.id);
+        return true; // Proceed if valid
+    }
+
+    function checkElectrolyzerSelection() {
+        const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
+        if (!selectedOption) {
+            alert("Please select an electrolyzer type.");
+            return false; // Stop execution
+        } 
+        alert("Electrolyzer type selected: " + selectedOption.id);
+        return true; // Proceed if valid
+    }
+
+    function getSliderValues() {
+        const slider1 = document.getElementById('parameter1');
+        const slider2 = document.getElementById('parameter2');
+
+        if (!slider1 || !slider2) {
+            console.error("One or both sliders not found.");
+            return;
+        }
+
+        const value1 = slider1.value;
+        const value2 = slider2.value;
+
+        const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
+            value1 == 50 ? 'Average' : 
+            value1 == 75 ? 'Optimistic' : 
+            'Expert Validated';
+
+        const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optimistic');
+
+        alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
+    }
+
+    function checkSwitchSelection() {
+        const switchInput = document.getElementById("flexSwitchCheckDefault");
+        if (!switchInput) {
+            console.error("Switch element not found!");
+            return;
+        }
+
+        const switchSelection = switchInput.checked ? "Repurposed" : "New";
+        alert("Selection made: " + switchSelection);
+    }
+});
+
+
   </script>
 
 
