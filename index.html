@@ -131,57 +131,62 @@
                    <!-- Two Stepped Vertical Sliders with Tick Marks -->
                     <h5>Parameters</h5>
 
-                    <!-- Slider 1: Electrolyzed Efficiency -->
+                    <!-- Slider 1: Economic Input Boundaries -->
                     <div class="mb-3">
-                        <label for="parameter1" class="form-label">Electrolyzed Efficiency (%)</label>
-                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter1" list="efficiencyTicks">
-                        <datalist id="efficiencyTicks">
-                            <!-- Tick Marks at Low, Medium, High -->
-                            <option value="0" label="Low"></option>
-                            <option value="50" label="Medium"></option>
-                            <option value="100" label="High"></option>
+                        <label for="parameter1" class="form-label">Economic Input Boundaries</label>
+                        <input type="range" class="form-range" min="25" max="100" step="25" id="parameter1" list="economicInputBoundaries">
+                        <datalist id="economicInputBoundaries">
+                            <option value="25" label="Pessimistic"></option>
+                            <option value="50" label="Average"></option>
+                            <option value="75" label="Optimistic"></option>
+                            <option value="100" label="Expert Validated"></option>
                         </datalist>
-                        <div id="value1">Medium</div>
+                        <div id="value1">Average</div>
                     </div>
-                    <!-- Slider 2: Transmission Losses -->
+                    <!-- Slider 2: Technology Performance -->
                     <div>
-                        <label for="parameter2" class="form-label">Transmission Losses (%)</label>
-                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter2" list="lossesTicks">
-                        <datalist id="lossesTicks">
-                            <!-- Tick Marks at Low, Medium, High -->
-                            <option value="0" label="Low"></option>
-                            <option value="50" label="Medium"></option>
-                            <option value="100" label="High"></option>
+                        <label for="parameter2" class="form-label">Technology Performance</label>
+                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter2" list="techPerformance">
+                        <datalist id="techPerformance">
+                            <!-- Tick Marks at Pes, Ave, Opt -->
+                            <option value="0" label="Pessimistic"></option>
+                            <option value="50" label="Average"></option>
+                            <option value="100" label="Optimistic"></option>
                         </datalist>
-                        <div id="value2">Medium</div>
+                        <div id="value2">Average</div>
                     </div>
                 </div>
             </div>
 
             <script>
-                // Update Electrolyzed Efficiency value
-                const slider1 = document.getElementById('parameter1');
-                const value1 = document.getElementById('value1');
-                slider1.addEventListener('input', function() {
-                    if (slider1.value == 0) {
-                        value1.textContent = 'Low';
-                    } else if (slider1.value == 50) {
-                        value1.textContent = 'Medium';
-                    } else {
-                        value1.textContent = 'High';
-                    }
-                });
+                  const slider1 = document.getElementById('parameter1');
+                    const value1 = document.getElementById('value1');
+
+                    const labels = {
+                        25: "Pessimistic",
+                        50: "Average",
+                        75: "Optimistic",
+                        100: "Expert Validated"
+                    };
+
+                    slider1.addEventListener('input', function() {
+                        value1.textContent = labels[slider1.value] || "Unknown";
+                    });
+
+                    // Set the initial value correctly
+                    slider1.value = 50;
+                    value1.textContent = labels[50];
             
                 // Update Transmission Losses value
                 const slider2 = document.getElementById('parameter2');
                 const value2 = document.getElementById('value2');
                 slider2.addEventListener('input', function() {
                     if (slider2.value == 0) {
-                        value2.textContent = 'Low';
+                        value2.textContent = 'Pessimistic';
                     } else if (slider2.value == 50) {
-                        value2.textContent = 'Medium';
+                        value2.textContent = 'Average';
                     } else {
-                        value2.textContent = 'High';
+                        value2.textContent = 'Optimistic';
                     }
                 });
             </script>
@@ -321,12 +326,15 @@
                 const value2 = slider2.value;
 
                 // Convert the values to Low, Medium, or High
-                const efficiency = value1 == 0 ? 'Low' : (value1 == 50 ? 'Medium' : 'High');
-                const losses = value2 == 0 ? 'Low' : (value2 == 50 ? 'Medium' : 'High');
+                const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
+                   value1 == 50 ? 'Average' : 
+                   value1 == 75 ? 'Optimistic' : 
+                   'Expert Validated';
+                const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optmistic');
        
 
                 // You can also return or display the values in the UI if needed
-                    alert(`Electrolyzed Efficiency: ${efficiency}\nTransmission Losses: ${losses}`);
+                    alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
 
                     return efficiency, losses;
                 }
@@ -335,164 +343,16 @@
 
         // Run SQL queries accordingly -----------------------------------------------------------------------------------------
 
+        const dbPath = "database/h2-scenarios.sqlite"; // Path to database
+
 
         // Update Charts and tables ---------------------------------------------------------------------------------------------
 
 
 
 
-      const dbPath = "database/h2-scenarios.sqlite"; // Path to database
-      const rowsPerPage = 20; // Number of rows per page
-      let currentPage = 1; // Track the current page
-      let db; // To store the database object
-      let totalPages = 0; // Total pages in the table
-
-      console.log("Initializing sql.js...");
-      try {
-        const SQL = await initSqlJs({
-          locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
-        });
-        console.log("sql.js loaded successfully.");
-
-        console.log(`Fetching database from: ${dbPath}`);
-        const response = await fetch(dbPath);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch database: ${response.statusText}`);
-        }
-        const buffer = await response.arrayBuffer();
-        console.log("Database file loaded successfully.");
-
-        // Load the database
-        db = new SQL.Database(new Uint8Array(buffer));
-        console.log("Database initialized.");
-
-        // Get all tables
-        const tablesResult = db.exec(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`);
-        const tables = tablesResult[0]?.values.map(row => row[0]) || [];
-
-        console.log("Tables found:", tables);
-        const tablesDiv = document.getElementById("tables");
-        tablesDiv.innerHTML = ""; // Clear previous results
-
-        if (tables.length === 0) {
-          tablesDiv.innerHTML = "<p>No tables found in the database.</p>";
-          console.warn("No tables found.");
-          return;
-        }
-
-        // Fetch and display data for each table
-        tables.forEach(tableName => {
-          console.log(`Fetching data from table: ${tableName}`);
-          fetchTableData(tableName, currentPage, rowsPerPage);
-
-          // Fetch the table data and handle pagination
-          async function fetchTableData(tableName, page, limit) {
-            const offset = (page - 1) * limit;
-            const result = db.exec(`SELECT * FROM ${tableName} LIMIT ${limit} OFFSET ${offset}`);
-            const totalRowsResult = db.exec(`SELECT COUNT(*) FROM ${tableName}`);
-            const totalRows = totalRowsResult[0]?.values[0][0] || 0;
-            totalPages = Math.ceil(totalRows / rowsPerPage);
-
-            if (result.length > 0) {
-              const columns = result[0].columns;
-              const values = result[0].values;
-
-              // Create table element
-              const table = document.createElement("table");
-              const thead = document.createElement("thead");
-              const tbody = document.createElement("tbody");
-
-              // Header row
-              const headerRow = document.createElement("tr");
-              columns.forEach(column => {
-                const th = document.createElement("th");
-                th.textContent = column;
-                headerRow.appendChild(th);
-              });
-              thead.appendChild(headerRow);
-
-              // Data rows
-              values.forEach(row => {
-                const dataRow = document.createElement("tr");
-                row.forEach(value => {
-                  const td = document.createElement("td");
-                  td.textContent = value;
-                  dataRow.appendChild(td);
-                });
-                tbody.appendChild(dataRow);
-              });
-
-              table.appendChild(thead);
-              table.appendChild(tbody);
-
-              // Add table to the page
-              const container = document.createElement("div");
-              const title = document.createElement("h2");
-              title.textContent = `Table: ${tableName}`;
-              container.appendChild(title);
-              container.appendChild(table);
-
-              tablesDiv.innerHTML = ""; // Clear previous content
-              tablesDiv.appendChild(container);
-
-              // Create pagination controls
-              createPaginationControls();
-            } else {
-              console.warn(`No data found in table: ${tableName}`);
-            }
-          }
-
-          // Pagination controls with a sliding window for page numbers
-          function createPaginationControls() {
-            const paginationDiv = document.createElement("div");
-            paginationDiv.classList.add("pagination");
-
-            const prevButton = document.createElement("button");
-            prevButton.textContent = "Previous";
-            prevButton.disabled = currentPage === 1;
-            prevButton.addEventListener("click", () => {
-              currentPage--;
-              fetchTableData(tableName, currentPage, rowsPerPage);
-            });
-
-            const nextButton = document.createElement("button");
-            nextButton.textContent = "Next";
-            nextButton.disabled = currentPage === totalPages;
-            nextButton.addEventListener("click", () => {
-              currentPage++;
-              fetchTableData(tableName, currentPage, rowsPerPage);
-            });
-
-            paginationDiv.appendChild(prevButton);
-
-            // Display only a limited number of page buttons
-            const pageWindow = 5; // Number of pages to show at a time
-            const startPage = Math.max(1, currentPage - Math.floor(pageWindow / 2));
-            const endPage = Math.min(totalPages, startPage + pageWindow - 1);
-
-            for (let i = startPage; i <= endPage; i++) {
-              const pageButton = document.createElement("button");
-              pageButton.classList.add("page-number");
-              pageButton.textContent = i;
-              if (i === currentPage) {
-                pageButton.classList.add("active");
-              }
-              pageButton.addEventListener("click", () => {
-                currentPage = i;
-                fetchTableData(tableName, currentPage, rowsPerPage);
-              });
-              paginationDiv.appendChild(pageButton);
-            }
-
-            paginationDiv.appendChild(nextButton);
-
-            tablesDiv.appendChild(paginationDiv);
-          }
-        });
-      } catch (error) {
-        console.error("Error loading database:", error);
-        alert(`Failed to load the database: ${error.message}`);
-      }
+        
+      
     });
   </script>
 
