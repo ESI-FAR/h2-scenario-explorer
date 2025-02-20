@@ -94,19 +94,19 @@
                     <!-- Three Vertical Radio Buttons with Enlarged Icons and Increased Spacing -->
                     <div class="mb-4">
                         <div class="form-check d-flex align-items-center">
-                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config1">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="C-ON">
                             <img src="assets/icon_1.png" alt="Icon 1" class="icon">
                             <label class="form-check-label" for="config1"><small>Onshore centralized electrolysis</small></label>
                         </div>
 
                         <div class="form-check d-flex align-items-center">
-                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config2">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="C-OFF">
                             <img src="assets/icon_2.png" alt="Icon 2" class="icon">
                             <label class="form-check-label" for="config2"><small>Offshore centralized electrolysis</small></label>
                         </div>
 
                         <div class="form-check d-flex align-items-center">
-                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="config3">
+                            <input class="form-check-input me-2" type="radio" name="systemConfig" id="D-OFF">
                             <img src="assets/icon_3.png" alt="Icon 3" class="icon">
                             <label class="form-check-label" for="config3"><small>Offshore decentralized electrolysis</small></label>
                         </div>
@@ -134,8 +134,8 @@
 
                     <!-- Slider 1: Economic Input Boundaries -->
                     <div class="mb-3">
-                        <label for="parameter1" class="form-label">Economic Input Boundaries</label>
-                        <input type="range" class="form-range" min="25" max="100" step="25" id="parameter1" list="economicInputBoundaries">
+                        <label for="ecoBounds" class="form-label">Economic Input Boundaries</label>
+                        <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
                         <datalist id="economicInputBoundaries">
                             <option value="25" label="Pessimistic"></option>
                             <option value="50" label="Average"></option>
@@ -146,8 +146,8 @@
                     </div>
                     <!-- Slider 2: Technology Performance -->
                     <div>
-                        <label for="parameter2" class="form-label">Technology Performance</label>
-                        <input type="range" class="form-range" min="0" max="100" step="50" id="parameter2" list="techPerformance">
+                        <label for="techChoice" class="form-label">Technology Performance</label>
+                        <input type="range" class="form-range" min="0" max="100" step="50" id="techChoice" list="techPerformance">
                         <datalist id="techPerformance">
                             <!-- Tick Marks at Pes, Ave, Opt -->
                             <option value="0" label="Pessimistic"></option>
@@ -197,7 +197,7 @@
             </div>
 
             <script>
-                  const slider1 = document.getElementById('parameter1');
+                  const slider1 = document.getElementById('ecoBounds');
                     const value1 = document.getElementById('value1');
 
                     const labels = {
@@ -216,7 +216,7 @@
                     value1.textContent = labels[50];
             
                 // Update Transmission Losses value
-                const slider2 = document.getElementById('parameter2');
+                const slider2 = document.getElementById('techChoice');
                 const value2 = document.getElementById('value2');
                 slider2.addEventListener('input', function() {
                     if (slider2.value == 0) {
@@ -321,43 +321,37 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("load-db").addEventListener("click", async () => {
           // Stop execution if any of these checks fail
-          const selectedOption = checkConfigSelection();
-          if (!selectedOption) return;
+          const systemConfig = checkConfigSelection("systemConfig");
+          console.log(systemConfig);
+          if (!systemConfig) return;
           
-          const technologySelectedOption = checkElectrolyzerSelection();
+          const technologySelectedOption = checkConfigSelection("electrolyzerType");
           if (!technologySelectedOption) return;
+          console.log(technologySelectedOption);
 
           const { economicInputBoundaries, techPerformance } = getSliderValues();
 
           const switchSelection = checkSwitchSelection();
   
           // Proceed with charts
-          readDatabase(selectedOption.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
+          readDatabase(systemConfig.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
       });
   
-      function checkConfigSelection() {
-          const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
+      function checkConfigSelection(radioSelection) {
+          const selectedOption = document.querySelector(`input[name="${radioSelection}"]:checked`);
+           const radioSelectionName = {"systemConfig": "System Configuration", "electrolyzerType": "Electrolyzer Type"};
           if (!selectedOption) {
-              alert("Please select a system configuration.");
+
+              alert(`Please select a ${radioSelectionName[radioSelection]}.`);
               return false; // Stop execution
           } 
           //alert("Selection made: " + selectedOption.id);
           return selectedOption; // Proceed if valid
       }
-  
-      function checkElectrolyzerSelection() {
-          const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
-          if (!selectedOption) {
-              alert("Please select an electrolyzer type.");
-              return false; // Stop execution
-          } 
-          //alert("Electrolyzer type selected: " + selectedOption.id);
-          return selectedOption; // Proceed if valid
-      }
-  
+          
       function getSliderValues() {
-          const slider1 = document.getElementById('parameter1');
-          const slider2 = document.getElementById('parameter2');
+          const slider1 = document.getElementById('ecoBounds');
+          const slider2 = document.getElementById('techChoice');
   
           if (!slider1 || !slider2) {
               console.error("One or both sliders not found.");
@@ -396,12 +390,19 @@
       }
     });
       
-    async function readDatabase(selectedOption, selectedOption2, economicInputBoundaries, techPerformance, switchSelection) {
-      alert(selectedOption);
-      alert(selectedOption2);
-      alert(economicInputBoundaries);
-      alert(techPerformance);
-      alert(switchSelection);
+    async function readDatabase(systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection) {
+      console.log(systemConfig);
+      console.log(electrolyzerType);
+      console.log(economicInputBoundaries);
+      console.log(techPerformance);
+      console.log(switchSelection);
+     
+
+      alert(systemConfig);
+
+    
+
+
       const dbPath = "database/h2-scenarios.sqlite"; // Path to database
   
       console.log("Initializing sql.js...");
