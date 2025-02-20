@@ -317,83 +317,92 @@
 </section>
 
 
-
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("load-db").addEventListener("click", async () => {
-        // Stop execution if any of these checks fail
-        if (!checkConfigSelection()) return;
-        if (!checkElectrolyzerSelection()) return;
-        getSliderValues();
-        checkSwitchSelection();
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("load-db").addEventListener("click", async () => {
+          // Stop execution if any of these checks fail
+          const selectedOption = checkConfigSelection();
+          if (!selectedOption) return;
+          
+          const technologySelectedOption = checkElectrolyzerSelection();
+          if (!technologySelectedOption) return;
 
-        // Proceed with charts
-        renderCharts();
-    });
+          const { economicInputBoundaries, techPerformance } = getSliderValues();
 
-    function checkConfigSelection() {
-        const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
-        if (!selectedOption) {
-            alert("Please select a system configuration.");
-            return false; // Stop execution
-        } 
-        alert("Selection made: " + selectedOption.id);
-        return true; // Proceed if valid
-    }
-
-    function checkElectrolyzerSelection() {
-        const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
-        if (!selectedOption) {
-            alert("Please select an electrolyzer type.");
-            return false; // Stop execution
-        } 
-        alert("Electrolyzer type selected: " + selectedOption.id);
-        return true; // Proceed if valid
-    }
-
-    function getSliderValues() {
-        const slider1 = document.getElementById('parameter1');
-        const slider2 = document.getElementById('parameter2');
-
-        if (!slider1 || !slider2) {
-            console.error("One or both sliders not found.");
-            return;
-        }
-
-        const value1 = slider1.value;
-        const value2 = slider2.value;
-
-        const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
-            value1 == 50 ? 'Average' : 
-            value1 == 75 ? 'Optimistic' : 
-            'Expert Validated';
-
-        const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optimistic');
-
-        alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
-    }
-
-    function checkSwitchSelection() {
-        const switchInput = document.getElementById("flexSwitchCheckDefault");
-        if (!switchInput) {
-            console.error("Switch element not found!");
-            return;
-        }
-
-        const switchSelection = switchInput.checked ? "Repurposed" : "New";
-        alert("Selection made: " + switchSelection);
-    }
-
-
-    // Connect to database 
-    
-});
-  </script>
-
-<script>
+          const switchSelection = checkSwitchSelection();
   
+          // Proceed with charts
+          renderCharts(selectedOption.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
+      });
+  
+      function checkConfigSelection() {
+          const selectedOption = document.querySelector('input[name="systemConfig"]:checked');
+          if (!selectedOption) {
+              alert("Please select a system configuration.");
+              return false; // Stop execution
+          } 
+          //alert("Selection made: " + selectedOption.id);
+          return selectedOption; // Proceed if valid
+      }
+  
+      function checkElectrolyzerSelection() {
+          const selectedOption = document.querySelector('input[name="electrolyzerType"]:checked');
+          if (!selectedOption) {
+              alert("Please select an electrolyzer type.");
+              return false; // Stop execution
+          } 
+          //alert("Electrolyzer type selected: " + selectedOption.id);
+          return selectedOption; // Proceed if valid
+      }
+  
+      function getSliderValues() {
+          const slider1 = document.getElementById('parameter1');
+          const slider2 = document.getElementById('parameter2');
+  
+          if (!slider1 || !slider2) {
+              console.error("One or both sliders not found.");
+              return;
+          }
+  
+          const value1 = slider1.value;
+          const value2 = slider2.value;
+  
+          const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
+              value1 == 50 ? 'Average' : 
+              value1 == 75 ? 'Optimistic' : 
+              'Expert Validated';
+  
+          const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optimistic');
+  
+          //alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
 
-    async function renderCharts() {
+          return {
+                economicInputBoundaries,
+                techPerformance
+            };
+                
+      }
+  
+      function checkSwitchSelection() {
+          const switchInput = document.getElementById("flexSwitchCheckDefault");
+          if (!switchInput) {
+              console.error("Switch element not found!");
+              return;
+          }
+  
+          const switchSelection = switchInput.checked ? "Repurposed" : "New";
+          //alert("Selection made: " + switchSelection);
+          return switchSelection;
+      }
+    });
+    
+  
+    async function renderCharts(selectedOption, selectedOption2, economicInputBoundaries, techPerformance, switchSelection) {
+      alert(selectedOption);
+      alert(selectedOption2);
+      alert(economicInputBoundaries);
+      alert(techPerformance);
+      alert(switchSelection);
       const dbPath = "database/h2-scenarios.sqlite"; // Path to database
   
       console.log("Initializing sql.js...");
@@ -415,75 +424,24 @@
         const db = new SQL.Database(new Uint8Array(buffer));
         console.log("Database initialized.");
   
-        // Get all tables
-        const tablesResult = db.exec(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`);
-        const tables = tablesResult[0]?.values.map(row => row[0]) || [];
+        // Query 1: Fetch all records from system_costs where bound_eco = 'HB'
+        const systemCostsResult = db.exec("SELECT * FROM system_costs WHERE bound_eco = 'HB'");
+        const systemCostsArray = systemCostsResult.length > 0 ? systemCostsResult[0].values : [];
+        console.log("System Costs:", systemCostsArray);
   
-        console.log("Tables found:", tables);
-        const tablesDiv = document.getElementById("tables");
-        tablesDiv.innerHTML = ""; // Clear previous results
-  
-        if (tables.length === 0) {
-          tablesDiv.innerHTML = "<p>No tables found in the database.</p>";
-          console.warn("No tables found.");
-          return;
-        }
-  
-        tables.forEach(tableName => {
-          console.log(`Fetching data from table: ${tableName}`);
-          const result = db.exec(`SELECT * FROM ${tableName}`);
-  
-          if (result.length > 0) {
-            const columns = result[0].columns;
-            const values = result[0].values;
-  
-            // Create table element
-            const table = document.createElement("table");
-            const thead = document.createElement("thead");
-            const tbody = document.createElement("tbody");
-  
-            // Header row
-            const headerRow = document.createElement("tr");
-            columns.forEach(column => {
-              const th = document.createElement("th");
-              th.textContent = column;
-              headerRow.appendChild(th);
-            });
-            thead.appendChild(headerRow);
-  
-            // Data rows
-            values.forEach(row => {
-              const dataRow = document.createElement("tr");
-              row.forEach(value => {
-                const td = document.createElement("td");
-                td.textContent = value;
-                dataRow.appendChild(td);
-              });
-              tbody.appendChild(dataRow);
-            });
-  
-            table.appendChild(thead);
-            table.appendChild(tbody);
-  
-            // Add table to the page
-            const container = document.createElement("div");
-            const title = document.createElement("h2");
-            title.textContent = `Table: ${tableName}`;
-            container.appendChild(title);
-            container.appendChild(table);
-  
-            tablesDiv.appendChild(container);
-          } else {
-            console.warn(`No data found in table: ${tableName}`);
-          }
-        });
-  
+        // Query 2: Fetch distinct bound_tech where bound_eco = 'HB'
+        const boundTechResult = db.exec("SELECT DISTINCT bound_tech FROM system_costs WHERE bound_eco = 'HB'");
+        const boundTechArray = boundTechResult.length > 0 ? boundTechResult[0].values.flat() : [];
+        console.log("Distinct Bound Tech:", boundTechArray);
+      
       } catch (error) {
         console.error("Error loading database:", error);
         alert(`Failed to load the database: ${error.message}`);
       }
     }
   </script>
+  
+  
   
 
 <script src="script/main.js"></script>
