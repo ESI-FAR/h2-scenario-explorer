@@ -332,7 +332,7 @@
           const switchSelection = checkSwitchSelection();
   
           // Proceed with charts
-          renderCharts(selectedOption.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
+          readDatabase(selectedOption.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
       });
   
       function checkConfigSelection() {
@@ -395,9 +395,8 @@
           return switchSelection;
       }
     });
-    
-  
-    async function renderCharts(selectedOption, selectedOption2, economicInputBoundaries, techPerformance, switchSelection) {
+      
+    async function readDatabase(selectedOption, selectedOption2, economicInputBoundaries, techPerformance, switchSelection) {
       alert(selectedOption);
       alert(selectedOption2);
       alert(economicInputBoundaries);
