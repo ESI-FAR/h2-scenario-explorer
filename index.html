@@ -257,6 +257,8 @@
 
         <!-- Row for Side-by-Side Charts and Tables -->
         <div  class="row justify-content-center" >
+
+          
             
             <!-- Histogram Chart and Table Side by Side -->
             <div class="col-md-6 d-flex align-items-center justify-content-center">
@@ -504,8 +506,19 @@
         const capexData = systemCostsArray.map(entry => entry.CAPEX);
         const oemData = systemCostsArray.map(entry => entry.OeM);
 
+        const histogramCanvas = document.getElementById('histogramChart');
+        if (!histogramCanvas) {
+            console.error("Canvas element 'histogramChart' not found!");
+            return; // Prevents further execution
+        }
+        
+
         // Stacked Bar Chart: System Costs (CAPEX & O&M)
         const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+
+        histogramCanvas.width = 500;  // Set width in pixels
+        histogramCanvas.height = 300; // Set height in pixels
+
         new Chart(histogramCtx, {
             type: 'bar',
             data: {
