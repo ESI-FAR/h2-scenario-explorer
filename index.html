@@ -118,13 +118,13 @@
                     <h5>Electrolyzer Type</h5>
                     <div class="d-flex justify-content-start mb-4">
                         <div class="form-check d-flex align-items-center me-3">
-                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="alk" >
-                            <label class="form-check-label" for="alk"><small>ALK</small></label>
+                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="ALK" >
+                            <label class="form-check-label" for="ALK"><small>ALK</small></label>
                         </div>
 
                         <div class="form-check d-flex align-items-center">
-                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="pem">
-                            <label class="form-check-label" for="pem"><small>PEM</small></label>
+                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="PEM">
+                            <label class="form-check-label" for="PEM"><small>PEM</small></label>
                         </div>
                     </div>
                     
@@ -140,7 +140,7 @@
                             <option value="25" label="Pessimistic"></option>
                             <option value="50" label="Average"></option>
                             <option value="75" label="Optimistic"></option>
-                            <option value="100" label="Expert Validated"></option>
+                            <option value="100" label="ref"></option>
                         </datalist>
                         <div id="value1">Average</div>
                     </div>
@@ -361,12 +361,12 @@
           const value1 = slider1.value;
           const value2 = slider2.value;
   
-          const economicInputBoundaries = value1 == 25 ? 'Pessimistic' : 
-              value1 == 50 ? 'Average' : 
-              value1 == 75 ? 'Optimistic' : 
-              'Expert Validated';
+          const economicInputBoundaries = value1 == 25 ? 'LB' : 
+              value1 == 50 ? 'avg' : 
+              value1 == 75 ? 'HB' : 
+              'res';
   
-          const techPerformance = value2 == 0 ? 'Pessimistic' : (value2 == 50 ? 'Average' : 'Optimistic');
+          const techPerformance = value2 == 0 ? 'pes' : (value2 == 50 ? 'avg' : 'opt');
   
           //alert(`Economic Input Boundaries: ${economicInputBoundaries}\nTechnology Performance: ${techPerformance}`);
 
@@ -384,61 +384,99 @@
               return;
           }
   
-          const switchSelection = switchInput.checked ? "Repurposed" : "New";
+          const switchSelection = switchInput.checked ? "0" : "1";
           //alert("Selection made: " + switchSelection);
           return switchSelection;
       }
     });
       
     async function readDatabase(systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection) {
-      console.log(systemConfig);
-      console.log(electrolyzerType);
-      console.log(economicInputBoundaries);
-      console.log(techPerformance);
-      console.log(switchSelection);
-     
+    console.log(systemConfig);
+    console.log(electrolyzerType);
+    console.log(economicInputBoundaries);
+    console.log(techPerformance);
+    console.log(switchSelection);
 
-      alert(systemConfig);
+    const dbPath = "database/h2-scenarios.sqlite"; // Path to database
 
-    
-
-
-      const dbPath = "database/h2-scenarios.sqlite"; // Path to database
-  
-      console.log("Initializing sql.js...");
-      try {
+    console.log("Initializing sql.js...");
+    try {
         const SQL = await initSqlJs({
-          locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
+            locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
         });
         console.log("sql.js loaded successfully.");
-  
+
         console.log(`Fetching database from: ${dbPath}`);
         const response = await fetch(dbPath);
         if (!response.ok) {
-          throw new Error(`Failed to fetch database: ${response.statusText}`);
+            throw new Error(`Failed to fetch database: ${response.statusText}`);
         }
         const buffer = await response.arrayBuffer();
         console.log("Database file loaded successfully.");
-  
+
         // Load the database
         const db = new SQL.Database(new Uint8Array(buffer));
         console.log("Database initialized.");
-  
-        // Query 1: Fetch all records from system_costs where bound_eco = 'HB'
-        const systemCostsResult = db.exec("SELECT * FROM system_costs WHERE bound_eco = 'HB'");
-        const systemCostsArray = systemCostsResult.length > 0 ? systemCostsResult[0].values : [];
+
+        // ✅ Query 1: Fetch all records from time_dep_costs with dynamic parameters
+        const stmt1 = db.prepare(
+            `SELECT year, CAPEX, OeM FROM time_dep_costs 
+             WHERE sysconfig = ? 
+             AND technology = ? 
+             AND distance = 100 
+             AND bound_eco = ? 
+             AND bound_tech = ? 
+             AND rep_pipe = ?;`
+        );
+
+
+        console.log(switchSelection);
+
+        stmt1.bind([systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
+
+        let systemCostsArray = [];
+        while (stmt1.step()) {
+            systemCostsArray.push(stmt1.getAsObject());
+        }
+        stmt1.free(); // Free up resources
+
         console.log("System Costs:", systemCostsArray);
-  
-        // Query 2: Fetch distinct bound_tech where bound_eco = 'HB'
-        const boundTechResult = db.exec("SELECT DISTINCT bound_tech FROM system_costs WHERE bound_eco = 'HB'");
-        const boundTechArray = boundTechResult.length > 0 ? boundTechResult[0].values.flat() : [];
-        console.log("Distinct Bound Tech:", boundTechArray);
-      
-      } catch (error) {
+
+        // ✅ Query 2: Fetch LCOH breakdown with dynamically bound parameters
+        const stmt2 = db.prepare(
+            `SELECT component_groups, SUM(LCOH_breakdown_percent) AS LCOH_percent 
+             FROM system_costs 
+             WHERE sysconfig = ? 
+             AND technology = ? 
+             AND distance = 100 
+             AND bound_eco = ? 
+             AND bound_tech = ? 
+             AND rep_pipe = ? 
+             GROUP BY component_groups 
+             ORDER BY LCOH_percent DESC;`
+        );
+
+        stmt2.bind([systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
+
+        let boundTechArray = [];
+        while (stmt2.step()) {
+            boundTechArray.push(stmt2.getAsObject());
+        }
+        stmt2.free(); // Free up resources
+
+        console.log("Bound Tech Data:", boundTechArray);
+
+        // ✅ Close the database after execution
+        db.close();
+
+    } catch (error) {
         console.error("Error loading database:", error);
         alert(`Failed to load the database: ${error.message}`);
-      }
     }
+}
+
+
+    
   </script>
   
   
