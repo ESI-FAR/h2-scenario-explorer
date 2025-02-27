@@ -448,7 +448,7 @@
 
         console.log("System Costs:", systemCostsArray);
 
-        // ✅ Query 2: Fetch LCOH breakdown with dynamically bound parameters
+        //  Query 2: Fetch LCOH breakdown with dynamically bound parameters
         const stmt2 = db.prepare(
             `SELECT component_groups, SUM(LCOH_breakdown_percent) AS LCOH_percent 
              FROM system_costs 
@@ -472,7 +472,7 @@
 
         console.log("Bound Tech Data:", boundTechArray);
 
-        // ✅ Close the database after execution
+        //  Close the database after execution
         db.close();
 
         generateSystemCostsChart(systemCostsArray,boundTechArray);
@@ -482,9 +482,6 @@
         console.error("Error loading database:", error);
         alert(`Failed to load the database: ${error.message}`);
     }
-
-   
-
 
 
 
@@ -499,7 +496,7 @@
  function generateSystemCostsChart(systemCostsArray, boundTechArray) {
     console.log("Start plot generation...");
 
-    // ✅ Ensure system costs data exists before plotting
+    // Ensure system costs data exists before plotting
     if (systemCostsArray.length > 0) {
         // Extract data for the bar chart
         const years = systemCostsArray.map(entry => entry.year);
@@ -512,7 +509,7 @@
             return; // Prevents further execution
         }
 
-        // ✅ Stacked Bar Chart: System Costs (CAPEX & O&M)
+        //  Stacked Bar Chart: System Costs (CAPEX & O&M)
         const histogramCtx = histogramCanvas.getContext('2d');
 
         histogramCanvas.width = 500;  // Set width in pixels
@@ -569,6 +566,11 @@
             return;
         }
 
+
+         // Set size for pie chart dynamically
+         pieCanvas.width = 400;  
+        pieCanvas.height = 400;
+
         const pieCtx = pieCanvas.getContext('2d');
 
         //  Pie Chart: LCOH Breakdown
@@ -597,11 +599,6 @@
         console.error("Bound tech array is empty, cannot generate pie chart.");
     }
 }
-
-
-
-
-
 
     
   </script>
