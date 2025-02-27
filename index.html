@@ -475,7 +475,7 @@
         // ✅ Close the database after execution
         db.close();
 
-        generateSystemCostsChart(systemCostsArray);
+        generateSystemCostsChart(systemCostsArray,boundTechArray);
 
 
     } catch (error) {
@@ -496,12 +496,12 @@
 
  // Histogram (Bar Chart) Data ---------------------------------------------------
 
-
- function generateSystemCostsChart(systemCostsArray) {
+ function generateSystemCostsChart(systemCostsArray, boundTechArray) {
     console.log("Start plot generation...");
 
+    // ✅ Ensure system costs data exists before plotting
     if (systemCostsArray.length > 0) {
-        // Extract data for the chart
+        // Extract data for the bar chart
         const years = systemCostsArray.map(entry => entry.year);
         const capexData = systemCostsArray.map(entry => entry.CAPEX);
         const oemData = systemCostsArray.map(entry => entry.OeM);
@@ -511,10 +511,9 @@
             console.error("Canvas element 'histogramChart' not found!");
             return; // Prevents further execution
         }
-        
 
-        // Stacked Bar Chart: System Costs (CAPEX & O&M)
-        const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+        // ✅ Stacked Bar Chart: System Costs (CAPEX & O&M)
+        const histogramCtx = histogramCanvas.getContext('2d');
 
         histogramCanvas.width = 500;  // Set width in pixels
         histogramCanvas.height = 300; // Set height in pixels
@@ -555,34 +554,50 @@
             }
         });
     } else {
-        console.error("System costs array is empty, cannot generate chart.");
+        console.error("System costs array is empty, cannot generate bar chart.");
     }
 
+    //  Ensure LCOH data exists before plotting the Pie Chart
+    if (boundTechArray.length > 0) {
+        // Extract Pie Chart data from `boundTechArray`
+        const componentLabels = boundTechArray.map(entry => entry.component_groups);
+        const lcohData = boundTechArray.map(entry => entry.LCOH_percent);
 
+        const pieCanvas = document.getElementById('pieChart');
+        if (!pieCanvas) {
+            console.error("Canvas element 'pieChart' not found!");
+            return;
+        }
 
-// Pie Chart (No Changes)
-const pieCtx = document.getElementById('pieChart').getContext('2d');
-new Chart(pieCtx, {
-    type: 'pie',
-    data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple'],
-        datasets: [{
-            label: 'Sample Data',
-            data: [10, 20, 30, 25, 15],
-            backgroundColor: [
-                '#FF6384',
-                '#36A2EB',
-                '#FFCE56',
-                '#4BC0C0',
-                '#9966FF'
-            ]
-        }]
+        const pieCtx = pieCanvas.getContext('2d');
+
+        //  Pie Chart: LCOH Breakdown
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: componentLabels,
+                datasets: [{
+                    label: 'LCOH Breakdown (%)',
+                    data: lcohData,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#8B0000'
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'LCOH Breakdown by Component Group'
+                    }
+                }
+            }
+        });
+    } else {
+        console.error("Bound tech array is empty, cannot generate pie chart.");
     }
-});
-
-
-
 }
+
 
 
 
