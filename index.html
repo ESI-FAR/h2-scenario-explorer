@@ -389,6 +389,10 @@
           return switchSelection;
       }
     });
+
+
+     // ----------------------SQLite Database Queries--------------------------------------
+
       
     async function readDatabase(systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection) {
     console.log(systemConfig);
@@ -418,7 +422,7 @@
         const db = new SQL.Database(new Uint8Array(buffer));
         console.log("Database initialized.");
 
-        // ✅ Query 1: Fetch all records from time_dep_costs with dynamic parameters
+        // Query 1: Fetch all records from time_dep_costs with dynamic parameters
         const stmt1 = db.prepare(
             `SELECT year, CAPEX, OeM FROM time_dep_costs 
              WHERE sysconfig = ? 
@@ -469,11 +473,106 @@
         // ✅ Close the database after execution
         db.close();
 
+        generateSystemCostsChart(systemCostsArray);
+
+
     } catch (error) {
         console.error("Error loading database:", error);
         alert(`Failed to load the database: ${error.message}`);
     }
+
+   
+
+
+
+
 }
+
+
+ // ----------------------------------------------------------------------------------
+
+
+ // Histogram (Bar Chart) Data ---------------------------------------------------
+
+
+ function generateSystemCostsChart(systemCostsArray) {
+    console.log("Start plot generation...");
+
+    if (systemCostsArray.length > 0) {
+        // Extract data for the chart
+        const years = systemCostsArray.map(entry => entry.year);
+        const capexData = systemCostsArray.map(entry => entry.CAPEX);
+        const oemData = systemCostsArray.map(entry => entry.OeM);
+
+        // Stacked Bar Chart: System Costs (CAPEX & O&M)
+        const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+        new Chart(histogramCtx, {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'CAPEX',
+                        data: capexData,
+                        backgroundColor: '#FF6384' // Red
+                    },
+                    {
+                        label: 'O&M',
+                        data: oemData,
+                        backgroundColor: '#36A2EB' // Blue
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'System Costs (CAPEX & O&M) Over Time'
+                    }
+                },
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true
+                    }
+                }
+            }
+        });
+    } else {
+        console.error("System costs array is empty, cannot generate chart.");
+    }
+
+
+
+// Pie Chart (No Changes)
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple'],
+        datasets: [{
+            label: 'Sample Data',
+            data: [10, 20, 30, 25, 15],
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF'
+            ]
+        }]
+    }
+});
+
+
+
+}
+
+
+
 
 
     
@@ -482,7 +581,6 @@
   
   
 
-<script src="script/main.js"></script>
 
 <!-- Add Font Awesome CDN in the <head> section if not already included -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
