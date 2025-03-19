@@ -166,6 +166,19 @@
                         
                        <hr>
                         <div class="row">
+                            <div class="col-md-6">
+                                <h5>Distance</h5>
+                                <div class="mb-3">
+                                <input type="range" class="form-range" min="25" max="100" step="25" id="distBounds" list="economicInputBoundaries">
+                                <datalist id="distInputBoundaries">
+                                    <option value="50" label="50 km"></option>
+                                    <option value="100" label="100 km"></option>
+                                    <option value="200" label="200 km"></option>
+                                    <option value="300" label="300 km"></option>
+                                </datalist>
+                                <div id="valued">100 km</div>
+                                </div>
+                            </div>
                         <div class="col-md-6">
                             <h5>Status</h5>
                             <div class="form-check form-switch">
@@ -176,20 +189,7 @@
                             </label> 
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <h5>Distance</h5>
-                            <div class="mb-3">
-                            <label for="ecoBounds" class="form-label">from onshore</label>
-                            <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
-                            <datalist id="economicInputBoundaries">
-                                <option value="50" label="50 km"></option>
-                                <option value="100" label="100 km"></option>
-                                <option value="200" label="200 km"></option>
-                                <option value="300" label="300 km"></option>
-                            </datalist>
-                            <div id="value1">100 km</div>
-                            </div>
-                        </div>
+                        
                         </div>
 
                                                 
@@ -213,10 +213,26 @@
                                 }
                             });
                         </script>
+
+                        <script>
+                            // Wait until the DOM is fully loaded
+                            document.addEventListener('DOMContentLoaded', function() {
+                            // Get the slider and display elements by their IDs
+                            const slider = document.getElementById('distBounds');
+                            const display = document.getElementById('valued');
+                            
+                            // Update display initially (in case the slider's default value isn't the same as the displayed value)
+                            display.textContent = slider.value + ' km';
+                            
+                            // Listen for the slider input event and update the display
+                            slider.addEventListener('input', function() {
+                                display.textContent = slider.value + ' km';
+                            });
+                            });
+                        </script>
+  
                         
                     </div>
-
-                    <!-- Distance: 50, 100, 200, 300  -->
                     <div>                        
                        
                     </div>
