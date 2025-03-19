@@ -129,47 +129,70 @@
                     </div>
                     
                     <hr>
-                   <!-- Two Stepped Vertical Sliders with Tick Marks -->
                     <h5>Parameters</h5>
-
-                    <!-- Slider 1: Economic Input Boundaries -->
-                    <div class="mb-3">
-                        <label for="ecoBounds" class="form-label">Economic Input Boundaries</label>
-                        <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
-                        <datalist id="economicInputBoundaries">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <!-- Slider 1: Economic Input Boundaries -->
+                        <div class="mb-3">
+                          <label for="ecoBounds" class="form-label">Economic Input Boundaries</label>
+                          <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
+                          <datalist id="economicInputBoundaries">
                             <option value="25" label="Pessimistic"></option>
                             <option value="50" label="Average"></option>
                             <option value="75" label="Optimistic"></option>
                             <option value="100" label="ref"></option>
-                        </datalist>
-                        <div id="value1">Average</div>
-                    </div>
-                    <!-- Slider 2: Technology Performance -->
-                    <div>
-                        <label for="techChoice" class="form-label">Technology Performance</label>
-                        <input type="range" class="form-range" min="0" max="100" step="50" id="techChoice" list="techPerformance">
-                        <datalist id="techPerformance">
-                            <!-- Tick Marks at Pes, Ave, Opt -->
+                          </datalist>
+                          <div id="value1">Average</div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <!-- Slider 2: Technology Performance -->
+                        <div>
+                          <label for="techChoice" class="form-label">Technology Performance</label>
+                          <input type="range" class="form-range" min="0" max="100" step="50" id="techChoice" list="techPerformance">
+                          <datalist id="techPerformance">
                             <option value="0" label="Pessimistic"></option>
                             <option value="50" label="Average"></option>
                             <option value="100" label="Optimistic"></option>
-                        </datalist>
-                        <div id="value2">Average</div>
+                          </datalist>
+                          <div id="value2">Average</div>
+                        </div>
+                      </div>
                     </div>
+                    
 
                     <!-- Switch: Repurposed, new -->
                      <div>
                         
-                        <hr>
-                        <h5>Status</h5>
-                        <div class="form-check form-switch">
+                       <hr>
+                        <div class="row">
+                        <div class="col-md-6">
+                            <h5>Status</h5>
+                            <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
                             <label class="form-check-label" for="flexSwitchCheckDefault">
                                 <span id="newText" style="font-weight: bold; color: black;">New</span> /
                                 <span id="repurposedText" style="color: lightgray;">Repurposed</span>
                             </label> 
+                            </div>
                         </div>
-                        
+                        <div class="col-md-6">
+                            <h5>Distance</h5>
+                            <div class="mb-3">
+                            <label for="ecoBounds" class="form-label">from onshore</label>
+                            <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
+                            <datalist id="economicInputBoundaries">
+                                <option value="50" label="50 km"></option>
+                                <option value="100" label="100 km"></option>
+                                <option value="200" label="200 km"></option>
+                                <option value="300" label="300 km"></option>
+                            </datalist>
+                            <div id="value1">100 km</div>
+                            </div>
+                        </div>
+                        </div>
+
+                                                
                         <script>
                             document.getElementById("flexSwitchCheckDefault").addEventListener("change", function() {
                                 let newText = document.getElementById("newText");
@@ -191,6 +214,11 @@
                             });
                         </script>
                         
+                    </div>
+
+                    <!-- Distance: 50, 100, 200, 300  -->
+                    <div>                        
+                       
                     </div>
 
                 </div>
