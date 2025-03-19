@@ -169,7 +169,7 @@
                             <div class="col-md-6">
                                 <h5>Distance</h5>
                                 <div class="mb-3">
-                                <input type="range" class="form-range" min="25" max="100" step="25" id="distBounds" list="economicInputBoundaries">
+                                <input type="range" class="form-range" min="25" max="100" step="25" id="distBounds" list="distanceInputBoundaries">
                                 <datalist id="distInputBoundaries">
                                     <option value="50" label="50 km"></option>
                                     <option value="100" label="100 km"></option>
@@ -179,16 +179,16 @@
                                 <div id="valued">100 km</div>
                                 </div>
                             </div>
-                        <div class="col-md-6">
-                            <h5>Status</h5>
-                            <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                            <label class="form-check-label" for="flexSwitchCheckDefault">
-                                <span id="newText" style="font-weight: bold; color: black;">New</span> /
-                                <span id="repurposedText" style="color: lightgray;">Repurposed</span>
-                            </label> 
+                            <div class="col-md-6">
+                                <h5>Status</h5>
+                                <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                <label class="form-check-label" for="flexSwitchCheckDefault">
+                                    <span id="newText" style="font-weight: bold; color: black;">New</span> /
+                                    <span id="repurposedText" style="color: lightgray;">Repurposed</span>
+                                </label> 
+                                </div>
                             </div>
-                        </div>
                         
                         </div>
 
@@ -292,8 +292,10 @@
 <section class="container my-5">
     <div class="p-4 bg-gray text-dark text-center">
         <h2>Scenarios Section</h2>
+        <div id="textforuser">
         <p>Click to explore scenarios...</p>
          <!-- Explore Scenario Button -->
+        </div>
          <button id="load-db" class="btn btn-primary">Explore Scenario</button>
 
        
@@ -378,9 +380,12 @@
           const { economicInputBoundaries, techPerformance } = getSliderValues();
 
           const switchSelection = checkSwitchSelection();
-  
+
+          const distanceSelection = checkDistanceSelection();
+
+ 
           // Proceed with charts
-          readDatabase(systemConfig.id, technologySelectedOption.id, economicInputBoundaries, techPerformance, switchSelection);
+          readDatabase(systemConfig.id, technologySelectedOption.id, distanceSelection, economicInputBoundaries, techPerformance, switchSelection);
       });
   
       function checkConfigSelection(radioSelection) {
@@ -434,18 +439,31 @@
           //alert("Selection made: " + switchSelection);
           return switchSelection;
       }
+
+      function checkDistanceSelection() {
+          const DistInput = document.getElementById("distBounds");
+          if (!DistInput) {
+              console.error("Distance element not found!");
+              return;
+          }
+  
+          const DistanceSelection = DistInput.value;
+          //alert("Selection made: " + switchSelection);
+          return DistanceSelection;
+      }
     });
 
 
      // ----------------------SQLite Database Queries--------------------------------------
 
       
-    async function readDatabase(systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection) {
+    async function readDatabase(systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection) {
     console.log(systemConfig);
     console.log(electrolyzerType);
     console.log(economicInputBoundaries);
     console.log(techPerformance);
     console.log(switchSelection);
+    console.log(distanceSelection);
 
     const dbPath = "database/h2-scenarios.sqlite"; // Path to database
 
@@ -473,7 +491,7 @@
             `SELECT year, CAPEX, OeM FROM time_dep_costs 
              WHERE sysconfig = ? 
              AND technology = ? 
-             AND distance = 100 
+             AND distance = ? 
              AND bound_eco = ? 
              AND bound_tech = ? 
              AND rep_pipe = ?;`
@@ -482,7 +500,7 @@
 
         console.log(switchSelection);
 
-        stmt1.bind([systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
+        stmt1.bind([systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
 
         let systemCostsArray = [];
         while (stmt1.step()) {
@@ -498,7 +516,7 @@
              FROM system_costs 
              WHERE sysconfig = ? 
              AND technology = ? 
-             AND distance = 100 
+             AND distance = ? 
              AND bound_eco = ? 
              AND bound_tech = ? 
              AND rep_pipe = ? 
@@ -506,7 +524,7 @@
              ORDER BY LCOH_percent DESC;`
         );
 
-        stmt2.bind([systemConfig, electrolyzerType, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
+        stmt2.bind([systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection]); // Bind all parameters
 
         let boundTechArray = [];
         while (stmt2.step()) {
