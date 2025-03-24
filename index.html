@@ -316,7 +316,7 @@
         <p>Click to explore scenarios...</p>
          <!-- Explore Scenario Button -->
         </div>
-         <button id="load-db" class="btn btn-primary">Explore Scenario</button>
+         <button onclick="FirstDataQuery()" id="load-db" class="btn btn-primary">Explore Scenario</button>
 
        
 
@@ -352,27 +352,41 @@
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("load-db").addEventListener("click", async () => {
-          // Stop execution if any of these checks fail
-          const systemConfig = checkConfigSelection("systemConfig");
-          console.log(systemConfig);
-          if (!systemConfig) return;
-          
-          const technologySelectedOption = checkConfigSelection("electrolyzerType");
-          if (!technologySelectedOption) return;
-          console.log(technologySelectedOption);
 
-          const { economicInputBoundaries, techPerformance } = getSliderValues();
+let isFirstQuery = true; // Initialize the first query
 
-          const switchSelection = checkSwitchSelection();
+function FirstDataQuery(){    
 
-          const distanceSelection = checkDistanceSelection();
+    document.getElementById("load-db").hidden = true; // hide button after the first query
+    document.getElementById("textforuser").innerHTML = "Change input to update charts..."; // change instruction text for the user
 
- 
-          // Proceed with charts
-          readDatabase(systemConfig.id, technologySelectedOption.id, distanceSelection, economicInputBoundaries, techPerformance, switchSelection);
-      });
+    const systemConfig = checkConfigSelection("systemConfig");
+    if (!systemConfig) {
+        if (isFirstQuery) alert("Please select a System Configuration.");
+        return;
+    }
+
+    const technologySelectedOption = checkConfigSelection("electrolyzerType");
+    if (!technologySelectedOption) {
+        if (isFirstQuery) alert("Please select an Electrolyzer Type.");
+        return;
+    }
+
+    const { economicInputBoundaries, techPerformance } = getSliderValues();
+    const switchSelection = checkSwitchSelection();
+    const distanceSelection = checkDistanceSelection();
+
+    // Proceed with charts
+    readDatabase(systemConfig.id, technologySelectedOption.id, distanceSelection, economicInputBoundaries, techPerformance, switchSelection);
+
+    // Set flag to false after first query
+    isFirstQuery = false;
+}
+
+
+
+
+    
   
       function checkConfigSelection(radioSelection) {
           const selectedOption = document.querySelector(`input[name="${radioSelection}"]:checked`);
@@ -437,7 +451,7 @@
           //alert("Selection made: " + switchSelection);
           return DistanceSelection;
       }
-    });
+    
 
 
      // ----------------------SQLite Database Queries--------------------------------------
@@ -541,7 +555,15 @@
 
  // Histogram (Bar Chart) Data ---------------------------------------------------
 
+ let histogramChartInstance = null;
+let pieChartInstance = null;
+
+
  function generateSystemCostsChart(systemCostsArray, boundTechArray) {
+
+    
+
+
     console.log("Start plot generation...");
 
     // Ensure system costs data exists before plotting
@@ -557,96 +579,144 @@
             return; // Prevents further execution
         }
 
+        
         //  Stacked Bar Chart: System Costs (CAPEX & O&M)
         const histogramCtx = histogramCanvas.getContext('2d');
 
         histogramCanvas.width = 500;  // Set width in pixels
         histogramCanvas.height = 300; // Set height in pixels
 
-        new Chart(histogramCtx, {
-            type: 'bar',
-            data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'CAPEX',
-                        data: capexData,
-                        backgroundColor: '#FF6384' // Red
-                    },
-                    {
-                        label: 'O&M',
-                        data: oemData,
-                        backgroundColor: '#36A2EB' // Blue
-                    }
-                ]
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'System Costs (CAPEX & O&M) Over Time'
-                    }
+        if (histogramChartInstance) {
+            histogramChartInstance.data.labels = years;
+            histogramChartInstance.data.datasets[0].data = capexData;
+            histogramChartInstance.data.datasets[1].data = oemData;
+            histogramChartInstance.update();
+        } else {
+            histogramChartInstance = new Chart(histogramCtx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'CAPEX',
+                            data: capexData,
+                            backgroundColor: '#FF6384'
+                        },
+                        {
+                            label: 'O&M',
+                            data: oemData,
+                            backgroundColor: '#36A2EB'
+                        }
+                    ]
                 },
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: true
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'System Costs (CAPEX & O&M) Over Time'
+                        }
                     },
-                    y: {
-                        stacked: true
+                    responsive: true,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true }
                     }
                 }
-            }
-        });
+            });
+        }
+
+
     } else {
         console.error("System costs array is empty, cannot generate bar chart.");
     }
 
-    //  Ensure LCOH data exists before plotting the Pie Chart
-    if (boundTechArray.length > 0) {
-        // Extract Pie Chart data from `boundTechArray`
-        const componentLabels = boundTechArray.map(entry => entry.component_groups);
-        const lcohData = boundTechArray.map(entry => entry.LCOH_percent);
+   // Ensure LCOH data exists before plotting the Vertical Bar Chart
+if (boundTechArray.length > 0) {
+    const componentLabels = boundTechArray.map(entry => entry.component_groups);
+    const lcohData = boundTechArray.map(entry => entry.LCOH_percent);
 
-        const pieCanvas = document.getElementById('pieChart');
-        if (!pieCanvas) {
-            console.error("Canvas element 'pieChart' not found!");
-            return;
-        }
+    const barCanvas = document.getElementById('pieChart'); // Reusing the same canvas ID
+    if (!barCanvas) {
+        console.error("Canvas element 'pieChart' not found!");
+        return;
+    }
 
+    barCanvas.width = 400;
+    barCanvas.height = 400;
 
-         // Set size for pie chart dynamically
-         pieCanvas.width = 400;  
-        pieCanvas.height = 400;
+    const barCtx = barCanvas.getContext('2d');
 
-        const pieCtx = pieCanvas.getContext('2d');
+    const barColors = [
+        '#FF6384', '#36A2EB', '#FFCE56',
+        '#4BC0C0', '#9966FF', '#8B0000',
+        '#00C49F', '#FF9F40', '#8A2BE2'
+    ];
 
-        //  Pie Chart: LCOH Breakdown
-        new Chart(pieCtx, {
-            type: 'pie',
+    if (pieChartInstance) {
+        pieChartInstance.data.labels = componentLabels;
+        pieChartInstance.data.datasets[0].data = lcohData;
+        pieChartInstance.data.datasets[0].backgroundColor = barColors.slice(0, lcohData.length);
+        pieChartInstance.update();
+    } else {
+        pieChartInstance = new Chart(barCtx, {
+            type: 'bar',
             data: {
                 labels: componentLabels,
                 datasets: [{
                     label: 'LCOH Breakdown (%)',
                     data: lcohData,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#8B0000'
-                    ]
+                    backgroundColor: barColors.slice(0, lcohData.length)
                 }]
             },
             options: {
+                indexAxis: 'x', // Vertical bars
                 plugins: {
                     title: {
                         display: true,
                         text: 'LCOH Breakdown by Component Group'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '% Contribution'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Component Group'
+                        }
                     }
                 }
             }
         });
-    } else {
-        console.error("Bound tech array is empty, cannot generate pie chart.");
     }
+
+} else {
+    console.error("Bound tech array is empty, cannot generate LCOH bar chart.");
 }
+
+
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="systemConfig"]').forEach((radio) => {
+        radio.addEventListener('change', () => {
+            if (!isFirstQuery) FirstDataQuery();
+        });
+    });
+
+    // You can add similar change handlers for other inputs if needed
+});
+
 
     
   </script>
