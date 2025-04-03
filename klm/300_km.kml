@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>300_km</name>
+	<open>1</open>
+	<atom:link rel="app" href="https://www.google.com/earth/about/versions/#earth-pro" title="Google Earth Pro 7.3.6.10201"></atom:link><gx:CascadingStyle kml:id="__managed_style_2207DB4E4F3711DAB252">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_2A36C245F43711DAB250">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff007cf5</color>
+			</LineStyle>
+			<PolyStyle>
+				<color>40007cf5</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_551056F0493711DAB252">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_4C3ABDE04A3711DAB252">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_12BEB413EB3711DAB250">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff007cf5</color>
+				<width>0.666667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40007cf5</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_3C40E6BA943711DAB251">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=d32f2f<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_2AA735C0843711DAB251">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=d32f2f<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle><gx:CascadingStyle kml:id="__managed_style_10546DF23A3711DAB252">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2<![CDATA[&]]>id=2000<![CDATA[&]]>scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"></hotSpot>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>0.666667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_007530E4023711DAB252">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#failed2</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#failed3</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="__managed_style_0CEA178C143711DAB250">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#failed0</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#failed</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="__managed_style_16B7D9FA823711DAB251">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#failed1</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#failed4</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="failed">
+		<LineStyle>
+			<color>ff0000ff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d0000ff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed0">
+		<LineStyle>
+			<color>ff0000ff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d0000ff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed1">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<Style id="failed2">
+		<LineStyle>
+			<color>ff7fffff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d7fffff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed3">
+		<LineStyle>
+			<color>ff7fffff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d7fffff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed4">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<StyleMap id="msn_blu-circle">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blu-circle</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blu-circle</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blu-circle">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<BalloonStyle>
+		</BalloonStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<Style id="sn_blu-circle">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<BalloonStyle>
+		</BalloonStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<Placemark id="05F863D9263711C048A7">
+		<name>Wind farm 4</name>
+		<styleUrl>#__managed_style_16B7D9FA823711DAB251</styleUrl>
+		<Point>
+			<extrude>1</extrude>
+			<coordinates>2.721808407609934,53.74357581600562,0</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark id="085C62B7913711C25B28">
+		<name>Untitled polygon</name>
+		<LookAt>
+			<longitude>3.92032317102782</longitude>
+			<latitude>53.62686334545416</latitude>
+			<altitude>-149.4631694362189</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<range>496558.099110648</range>
+			<altitudeMode>absolute</altitudeMode>
+			<gx:fovy>35</gx:fovy>
+		</LookAt>
+		<styleUrl>#__managed_style_0CEA178C143711DAB250</styleUrl>
+		<Polygon>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						2.712627180893101,53.63171777699954,0 3.065936921739907,53.81533133474515,0 2.787023121743613,53.95018707933985,0 2.439397675548982,53.76633866378832,0 2.712627180893101,53.63171777699954,0 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+	<Placemark id="05193C30153711C5839F">
+		<name>100 km range</name>
+		<LookAt>
+			<longitude>5.04870775141679</longitude>
+			<latitude>53.17997826743923</latitude>
+			<altitude>-46.23762101505816</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<range>526292.2608458251</range>
+			<altitudeMode>absolute</altitudeMode>
+			<gx:fovy>35</gx:fovy>
+		</LookAt>
+		<styleUrl>#__managed_style_007530E4023711DAB252</styleUrl>
+		<Polygon>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						2.72089884954283,53.61843023741505,0 4.018356100981886,51.23193970475672,0 7.544900563691062,53.25761002073587,0 3.043694417963663,53.80610190219747,0 2.72089884954283,53.61843023741505,0 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+	<Placemark id="05B31DB1753711C7B3BB">
+		<name>300 km range</name>
+		<LookAt>
+			<longitude>4.143992714625567</longitude>
+			<latitude>53.35039564833606</latitude>
+			<altitude>23.65960580030148</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<range>682603.7591008097</range>
+			<altitudeMode>absolute</altitudeMode>
+			<gx:fovy>35</gx:fovy>
+		</LookAt>
+		<styleUrl>#msn_blu-circle</styleUrl>
+		<Point>
+			<coordinates>3.937559392421417,53.20829844629781,192.2136502021586</coordinates>
+		</Point>
+	</Placemark>
+</Document>
+</kml>

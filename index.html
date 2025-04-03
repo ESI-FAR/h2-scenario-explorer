@@ -378,6 +378,7 @@ function FirstDataQuery(){
 
     // Proceed with charts
     readDatabase(systemConfig.id, technologySelectedOption.id, distanceSelection, economicInputBoundaries, techPerformance, switchSelection);
+    gisMap(distanceSelection); // function to update GIS map (see map.js) 
 
     // Set flag to false after first query
     isFirstQuery = false;
@@ -709,7 +710,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // System Configuration Radios
     document.querySelectorAll('input[name="systemConfig"]').forEach((radio) => {
         radio.addEventListener('change', () => {
-            if (!isFirstQuery) FirstDataQuery();
+            if (!isFirstQuery) FirstDataQuery();            
         });
     });
 
@@ -717,6 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('input[name="electrolyzerType"]').forEach((radio) => {
         radio.addEventListener('change', () => {
             if (!isFirstQuery) FirstDataQuery();
+            
         });
     });
 
