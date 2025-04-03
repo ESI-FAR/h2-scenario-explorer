@@ -9,7 +9,7 @@ window.onload = function() {
         // 2. Load the KML file containing wind farm data.
         new ol.layer.Vector({
           source: new ol.source.Vector({
-            url: '50_100_km.kml',
+            url: 'klm/50_100_km.kml',
             format: new ol.format.KML({
               extractStyles: true  // use styles defined in the KML if available
             })
