@@ -383,9 +383,6 @@ function FirstDataQuery(){
     isFirstQuery = false;
 }
 
-
-
-
     
   
       function checkConfigSelection(radioSelection) {
@@ -555,7 +552,7 @@ function FirstDataQuery(){
 
  // Histogram (Bar Chart) Data ---------------------------------------------------
 
- let histogramChartInstance = null;
+let histogramChartInstance = null;
 let pieChartInstance = null;
 
 
@@ -598,14 +595,17 @@ let pieChartInstance = null;
                         {
                             label: 'CAPEX',
                             data: capexData,
-                            backgroundColor: '#FF6384'
+                            backgroundColor: '#FF6384',
+                            yAxisID: 'y'
                         },
                         {
                             label: 'O&M',
                             data: oemData,
-                            backgroundColor: '#36A2EB'
+                            backgroundColor: '#36A2EB',
+                            yAxisID: 'y1'
                         }
                     ]
+
                 },
                 options: {
                     plugins: {
@@ -616,9 +616,30 @@ let pieChartInstance = null;
                     },
                     responsive: true,
                     scales: {
-                        x: { stacked: true },
-                        y: { stacked: true }
+                        x: {
+                            stacked: false
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'CAPEX'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'O&M'
+                            },
+                            grid: {
+                                drawOnChartArea: false // prevent grid overlap
+                            }
+                        }
                     }
+
                 }
             });
         }
