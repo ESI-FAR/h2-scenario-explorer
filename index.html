@@ -353,36 +353,50 @@
 
 <script>
 
+
 let isFirstQuery = true; // Initialize the first query
 
-function FirstDataQuery(){    
-
-    document.getElementById("load-db").hidden = true; // hide button after the first query
-    document.getElementById("textforuser").innerHTML = "Change input to update charts..."; // change instruction text for the user
-
+function FirstDataQuery() {    
+    // First, validate required selections without modifying the UI
     const systemConfig = checkConfigSelection("systemConfig");
     if (!systemConfig) {
         if (isFirstQuery) alert("Please select a System Configuration.");
-        return;
+        return; // Exit early without hiding the button
     }
 
     const technologySelectedOption = checkConfigSelection("electrolyzerType");
     if (!technologySelectedOption) {
         if (isFirstQuery) alert("Please select an Electrolyzer Type.");
-        return;
+        return; // Exit early without hiding the button
     }
 
+    // If we reach here, all required inputs have been set.
+    // Now hide the button and update the text for subsequent changes.
+    document.getElementById("load-db").hidden = true;
+    document.getElementById("textforuser").innerHTML = "Change input to update charts...";
+
+    // Retrieve other parameter values
     const { economicInputBoundaries, techPerformance } = getSliderValues();
     const switchSelection = checkSwitchSelection();
     const distanceSelection = checkDistanceSelection();
 
-    // Proceed with charts
-    readDatabase(systemConfig.id, technologySelectedOption.id, distanceSelection, economicInputBoundaries, techPerformance, switchSelection);
-    gisMap(distanceSelection); // function to update GIS map (see map.js) 
+    // Proceed with fetching and rendering the charts
+    readDatabase(
+        systemConfig.id,
+        technologySelectedOption.id,
+        distanceSelection,
+        economicInputBoundaries,
+        techPerformance,
+        switchSelection
+    );
 
-    // Set flag to false after first query
+    // Set flag to denote that the first query has run successfully
     isFirstQuery = false;
 }
+
+
+
+
 
     
   
@@ -449,7 +463,6 @@ function FirstDataQuery(){
           //alert("Selection made: " + switchSelection);
           return DistanceSelection;
       }
-    
 
 
      // ----------------------SQLite Database Queries--------------------------------------
