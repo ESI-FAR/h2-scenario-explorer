@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 <Document>
-	<name>50_100_km</name>
-	<open>1</open>
+	<name>50_km</name>
+	<visibility>0</visibility>
 	<atom:link rel="app" href="https://www.google.com/earth/about/versions/#earth-pro" title="Google Earth Pro 7.3.6.10201"></atom:link><gx:CascadingStyle kml:id="__managed_style_11824DB2C53711C7B3BE">
 		<Style>
 			<IconStyle>
@@ -216,16 +216,6 @@
 			</BalloonStyle>
 		</Style>
 	</gx:CascadingStyle>
-	<StyleMap id="__managed_style_00CEF458CC3711B90CB0">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#failed4</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#failed3</styleUrl>
-		</Pair>
-	</StyleMap>
 	<StyleMap id="__managed_style_00CEF458CC3711B90CB00">
 		<Pair>
 			<key>normal</key>
@@ -244,16 +234,6 @@
 		<Pair>
 			<key>highlight</key>
 			<styleUrl>#failed</styleUrl>
-		</Pair>
-	</StyleMap>
-	<StyleMap id="__managed_style_0C4CDA60CA3711C59207">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#failed5</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#failed2</styleUrl>
 		</Pair>
 	</StyleMap>
 	<Style id="failed">
@@ -280,38 +260,6 @@
 			<color>4d0000ff</color>
 		</PolyStyle>
 	</Style>
-	<Style id="failed2">
-		<LineStyle>
-			<color>ff7fffff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d7fffff</color>
-		</PolyStyle>
-	</Style>
-	<Style id="failed3">
-		<LineStyle>
-			<color>ff0000ff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d0000ff</color>
-		</PolyStyle>
-	</Style>
-	<Style id="failed4">
-		<LineStyle>
-			<color>ff0000ff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d0000ff</color>
-		</PolyStyle>
-	</Style>
-	<Style id="failed5">
-		<LineStyle>
-			<color>ff7fffff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d7fffff</color>
-		</PolyStyle>
-	</Style>
 	<Style id="failed6">
 		<LineStyle>
 			<color>ff0000ff</color>
@@ -320,16 +268,6 @@
 			<color>4d0000ff</color>
 		</PolyStyle>
 	</Style>
-	<StyleMap id="m_ylw-pushpin">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#s_ylw-pushpin2</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#s_ylw-pushpin_hl1</styleUrl>
-		</Pair>
-	</StyleMap>
 	<StyleMap id="msn_blu-circle">
 		<Pair>
 			<key>normal</key>
@@ -338,16 +276,6 @@
 		<Pair>
 			<key>highlight</key>
 			<styleUrl>#sh_blu-circle0</styleUrl>
-		</Pair>
-	</StyleMap>
-	<StyleMap id="msn_blu-circle0">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#sn_blu-circle</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#sh_blu-circle</styleUrl>
 		</Pair>
 	</StyleMap>
 	<StyleMap id="msn_red-circle">
@@ -360,48 +288,6 @@
 			<styleUrl>#sh_red-circle</styleUrl>
 		</Pair>
 	</StyleMap>
-	<StyleMap id="msn_red-circle0">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#sn_red-circle</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#sh_red-circle0</styleUrl>
-		</Pair>
-	</StyleMap>
-	<Style id="s_ylw-pushpin2">
-		<IconStyle>
-			<scale>1.1</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
-			</Icon>
-			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-	</Style>
-	<Style id="s_ylw-pushpin_hl1">
-		<IconStyle>
-			<scale>1.3</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
-			</Icon>
-			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-	</Style>
-	<Style id="sh_blu-circle">
-		<IconStyle>
-			<scale>1.3</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
-			</Icon>
-			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-		<ListStyle>
-			<ItemIcon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
-			</ItemIcon>
-		</ListStyle>
-	</Style>
 	<Style id="sh_blu-circle0">
 		<IconStyle>
 			<scale>1.3</scale>
@@ -430,34 +316,6 @@
 			</ItemIcon>
 		</ListStyle>
 	</Style>
-	<Style id="sh_red-circle0">
-		<IconStyle>
-			<scale>1.3</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
-			</Icon>
-			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-		<ListStyle>
-			<ItemIcon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
-			</ItemIcon>
-		</ListStyle>
-	</Style>
-	<Style id="sn_blu-circle">
-		<IconStyle>
-			<scale>1.1</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
-			</Icon>
-			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-		<ListStyle>
-			<ItemIcon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
-			</ItemIcon>
-		</ListStyle>
-	</Style>
 	<Style id="sn_blu-circle0">
 		<IconStyle>
 			<scale>1.1</scale>
@@ -469,20 +327,6 @@
 		<ListStyle>
 			<ItemIcon>
 				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
-			</ItemIcon>
-		</ListStyle>
-	</Style>
-	<Style id="sn_red-circle">
-		<IconStyle>
-			<scale>1.1</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
-			</Icon>
-			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-		<ListStyle>
-			<ItemIcon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
 			</ItemIcon>
 		</ListStyle>
 	</Style>
@@ -500,39 +344,9 @@
 			</ItemIcon>
 		</ListStyle>
 	</Style>
-	<Placemark id="05B31DB1753711C7B3BB">
-		<name>100 km range</name>
-		<LookAt>
-			<longitude>4.143992714625567</longitude>
-			<latitude>53.35039564833606</latitude>
-			<altitude>23.65960580030148</altitude>
-			<heading>0</heading>
-			<tilt>0</tilt>
-			<range>682603.7591008097</range>
-			<altitudeMode>absolute</altitudeMode>
-			<gx:fovy>35</gx:fovy>
-		</LookAt>
-		<styleUrl>#msn_blu-circle0</styleUrl>
-		<Point>
-			<coordinates>4.542566475010938,53.04328173947585,192.2136502021586</coordinates>
-		</Point>
-	</Placemark>
-	<Placemark>
-		<name>Untitled Polygon</name>
-		<styleUrl>#m_ylw-pushpin</styleUrl>
-		<Polygon>
-			<tessellate>1</tessellate>
-			<outerBoundaryIs>
-				<LinearRing>
-					<coordinates>
-						5.069192932095095,54.96046293056029,0 6.184272178190511,55.48653826490859,0 5.019200923967951,55.89035787661411,0 5.069192932095095,54.96046293056029,0 
-					</coordinates>
-				</LinearRing>
-			</outerBoundaryIs>
-		</Polygon>
-	</Placemark>
 	<Placemark id="027FBE0D503711B8CE3D">
 		<name>Untitled polygon</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>5.277598336306719</longitude>
 			<latitude>53.92066708316045</latitude>
@@ -556,6 +370,7 @@
 	</Placemark>
 	<Placemark id="097DB295CD3711B9F1A5">
 		<name>Untitled measurement</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>5.277598425308265</longitude>
 			<latitude>53.92066713505118</latitude>
@@ -577,39 +392,9 @@
 			</outerBoundaryIs>
 		</Polygon>
 	</Placemark>
-	<Placemark id="05F863D9263711C048A7">
-		<name>Wind farm 2: 100 km from shore</name>
-		<styleUrl>#msn_red-circle0</styleUrl>
-		<Point>
-			<extrude>1</extrude>
-			<coordinates>3.7773,53.39579999999999,0</coordinates>
-		</Point>
-	</Placemark>
-	<Placemark id="085C62B7913711C25B28">
-		<name>Untitled polygon</name>
-		<LookAt>
-			<longitude>3.92032317102782</longitude>
-			<latitude>53.62686334545416</latitude>
-			<altitude>-149.4631694362189</altitude>
-			<heading>0</heading>
-			<tilt>0</tilt>
-			<range>496558.099110648</range>
-			<altitudeMode>absolute</altitudeMode>
-			<gx:fovy>35</gx:fovy>
-		</LookAt>
-		<styleUrl>#__managed_style_00CEF458CC3711B90CB0</styleUrl>
-		<Polygon>
-			<outerBoundaryIs>
-				<LinearRing>
-					<coordinates>
-						3.470014869167968,53.13911509710066,0 4.369734276345971,53.60252506811616,0 3.991208493355987,53.80102820469451,0 3.042959036041306,53.32703517892682,0 3.470014869167968,53.13911509710066,0 
-					</coordinates>
-				</LinearRing>
-			</outerBoundaryIs>
-		</Polygon>
-	</Placemark>
 	<Placemark id="0DDC4104AC3711C44E72">
 		<name>Wind farm 1: 50 km from shore</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>5.183625181062521</longitude>
 			<latitude>53.33821878542955</latitude>
@@ -625,31 +410,9 @@
 			<coordinates>5.828533111756171,53.83619965503443,-150.9498835656303</coordinates>
 		</Point>
 	</Placemark>
-	<Placemark id="05193C30153711C5839F">
-		<name>100 km range</name>
-		<LookAt>
-			<longitude>5.04870775141679</longitude>
-			<latitude>53.17997826743923</latitude>
-			<altitude>-46.23762101505816</altitude>
-			<heading>0</heading>
-			<tilt>0</tilt>
-			<range>526292.2608458251</range>
-			<altitudeMode>absolute</altitudeMode>
-			<gx:fovy>35</gx:fovy>
-		</LookAt>
-		<styleUrl>#__managed_style_0C4CDA60CA3711C59207</styleUrl>
-		<Polygon>
-			<outerBoundaryIs>
-				<LinearRing>
-					<coordinates>
-						3.488522359386894,53.12884665744293,0 4.657068508644551,52.54839227659522,0 5.863668690021475,53.31048301635065,0 4.365544326024113,53.60296862082795,0 3.488522359386894,53.12884665744293,0 
-					</coordinates>
-				</LinearRing>
-			</outerBoundaryIs>
-		</Polygon>
-	</Placemark>
 	<Placemark id="07D151F1A83711C7D2D6">
 		<name>50 km range</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>4.143992714625567</longitude>
 			<latitude>53.35039564833606</latitude>
