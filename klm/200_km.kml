@@ -2,6 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 <Document>
 	<name>200_km</name>
+	<visibility>0</visibility>
 	<atom:link rel="app" href="https://www.google.com/earth/about/versions/#earth-pro" title="Google Earth Pro 7.3.6.10201"></atom:link><gx:CascadingStyle kml:id="__managed_style_2207DB4E4F3711DAB252">
 		<Style>
 			<IconStyle>
@@ -176,74 +177,34 @@
 	<StyleMap id="__managed_style_007530E4023711DAB252">
 		<Pair>
 			<key>normal</key>
-			<styleUrl>#failed</styleUrl>
+			<styleUrl>#failed7</styleUrl>
 		</Pair>
 		<Pair>
 			<key>highlight</key>
-			<styleUrl>#failed0</styleUrl>
+			<styleUrl>#failed8</styleUrl>
 		</Pair>
 	</StyleMap>
 	<StyleMap id="__managed_style_0CEA178C143711DAB250">
 		<Pair>
 			<key>normal</key>
-			<styleUrl>#failed4</styleUrl>
+			<styleUrl>#failed12</styleUrl>
 		</Pair>
 		<Pair>
 			<key>highlight</key>
-			<styleUrl>#failed2</styleUrl>
+			<styleUrl>#failed10</styleUrl>
 		</Pair>
 	</StyleMap>
 	<StyleMap id="__managed_style_16B7D9FA823711DAB251">
 		<Pair>
 			<key>normal</key>
-			<styleUrl>#failed1</styleUrl>
+			<styleUrl>#failed9</styleUrl>
 		</Pair>
 		<Pair>
 			<key>highlight</key>
-			<styleUrl>#failed3</styleUrl>
+			<styleUrl>#failed11</styleUrl>
 		</Pair>
 	</StyleMap>
-	<StyleMap id="__managed_style_3C0A3144D43711DAB252">
-		<Pair>
-			<key>normal</key>
-			<styleUrl>#__managed_style_4C3ABDE04A3711DAB252</styleUrl>
-		</Pair>
-		<Pair>
-			<key>highlight</key>
-			<styleUrl>#__managed_style_551056F0493711DAB252</styleUrl>
-		</Pair>
-	</StyleMap>
-	<Style id="failed">
-		<LineStyle>
-			<color>ff7fffff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d7fffff</color>
-		</PolyStyle>
-	</Style>
-	<Style id="failed0">
-		<LineStyle>
-			<color>ff7fffff</color>
-		</LineStyle>
-		<PolyStyle>
-			<color>4d7fffff</color>
-		</PolyStyle>
-	</Style>
-	<Style id="failed1">
-		<IconStyle>
-			<scale>1.1</scale>
-			<Icon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
-			</Icon>
-			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
-		</IconStyle>
-		<ListStyle>
-			<ItemIcon>
-				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
-			</ItemIcon>
-		</ListStyle>
-	</Style>
-	<Style id="failed2">
+	<Style id="failed10">
 		<LineStyle>
 			<color>ff0000ff</color>
 		</LineStyle>
@@ -251,7 +212,7 @@
 			<color>4d0000ff</color>
 		</PolyStyle>
 	</Style>
-	<Style id="failed3">
+	<Style id="failed11">
 		<IconStyle>
 			<scale>1.3</scale>
 			<Icon>
@@ -265,7 +226,7 @@
 			</ItemIcon>
 		</ListStyle>
 	</Style>
-	<Style id="failed4">
+	<Style id="failed12">
 		<LineStyle>
 			<color>ff0000ff</color>
 		</LineStyle>
@@ -273,8 +234,81 @@
 			<color>4d0000ff</color>
 		</PolyStyle>
 	</Style>
+	<Style id="failed7">
+		<LineStyle>
+			<color>ff7fffff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d7fffff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed8">
+		<LineStyle>
+			<color>ff7fffff</color>
+		</LineStyle>
+		<PolyStyle>
+			<color>4d7fffff</color>
+		</PolyStyle>
+	</Style>
+	<Style id="failed9">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<StyleMap id="msn_blu-circle">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blu-circle</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blu-circle</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blu-circle">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<BalloonStyle>
+		</BalloonStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+	<Style id="sn_blu-circle">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<BalloonStyle>
+		</BalloonStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-circle-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
 	<Placemark id="05F863D9263711C048A7">
 		<name>Wind farm 3</name>
+		<visibility>0</visibility>
 		<styleUrl>#__managed_style_16B7D9FA823711DAB251</styleUrl>
 		<Point>
 			<extrude>1</extrude>
@@ -283,6 +317,7 @@
 	</Placemark>
 	<Placemark id="085C62B7913711C25B28">
 		<name>Untitled polygon</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>3.92032317102782</longitude>
 			<latitude>53.62686334545416</latitude>
@@ -306,6 +341,7 @@
 	</Placemark>
 	<Placemark id="05193C30153711C5839F">
 		<name>100 km range</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>5.04870775141679</longitude>
 			<latitude>53.17997826743923</latitude>
@@ -329,6 +365,7 @@
 	</Placemark>
 	<Placemark id="05B31DB1753711C7B3BB">
 		<name>200 km range</name>
+		<visibility>0</visibility>
 		<LookAt>
 			<longitude>4.143992714625567</longitude>
 			<latitude>53.35039564833606</latitude>
@@ -339,7 +376,7 @@
 			<altitudeMode>absolute</altitudeMode>
 			<gx:fovy>35</gx:fovy>
 		</LookAt>
-		<styleUrl>#__managed_style_3C0A3144D43711DAB252</styleUrl>
+		<styleUrl>#msn_blu-circle</styleUrl>
 		<Point>
 			<coordinates>4.542566475010938,53.04328173947585,192.2136502021586</coordinates>
 		</Point>
