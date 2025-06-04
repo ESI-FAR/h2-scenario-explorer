@@ -5,6 +5,7 @@ Web App to visualize hydrogen production scenarios / HyChain WP1
 
 ```shell
 $ git clone https://github.com/ESI-FAR/h2-scenario-explorer.git
+$ cd h2-scenario-explorer/
 $ ./deploy.bash [web server top-level directory]
 ```
 
