@@ -4,59 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>H2 scenario explorer</title>
+
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- OpenLayers CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css">
     <!-- SQLite API -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <!-- Font Awesome (expand icon + github) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Reduce the header height */
-        header {
-            padding: 10px 0;
+        header { padding: 10px 0; }
+        .logo { height: 50px; }
+        #map { width: 100%; height: 400px; }
+        .icon { width: 24px; height: 24px; margin-right: 10px; }
+        .form-check { margin-bottom: 10px; }
+        .download-wrap { margin-top: 30px; }
+
+        /* Tiny light-gray expand button */
+        .expand-btn {
+            background: #f1f1f1;
+            border: 1px solid #d8d8d8;
+            color: #555;
+            padding: 2px 6px;
+            border-radius: 6px;
+            line-height: 1;
+            font-size: 12px;
+        }
+        .expand-btn:hover { background: #e9e9e9; }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        /* Logo size adjustment */
-        .logo {
-            height: 50px;
-        }
-
-        /* Set the map height */
-        #map {
+        .modal-fullscreen .modal-body { padding: 12px; }
+        .modal-chart-wrap {
             width: 100%;
-            height: 400px;
+            height: calc(100vh - 140px);
+            position: relative;
+        }
+        #modalChartCanvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        /* Icon size */
-        .icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 10px;
-        }
-
-        /* Spacing for toggles */
-        .form-check {
-            margin-bottom: 10px;
-        }
-
-        /* Download button spacing */
-        .download-wrap {
-            margin-top: 30px;
-        }
+        /* Hide chart area (and expand buttons) until charts are available */
+        #charts-row { display: none; }
     </style>
 </head>
+
 <body>
 
-    <!-- Header with Logo -->
+    <!-- Header -->
     <header class="text-white" style="background-color: #009DDD;">
         <div class="container d-flex align-items-center justify-content-between">
-            <!-- Logo on the Left -->
             <div>
                 <img src="assets/escience_favicon.png" alt="Logo" class="logo">
             </div>
-
-            <!-- Header Text -->
             <div class="text-end">
                 <h1 class="h4 mb-0">H<sub>2</sub> Production</h1>
                 <p class="mb-0">scenario explorer</p>
@@ -64,27 +72,19 @@
         </div>
     </header>
 
-    <!-- First Section: Two Equal Columns -->
+    <!-- First Section -->
     <section class="container my-5">
         <div class="row">
-            <!-- Left Column with Toggles and Sliders -->
+            <!-- Left -->
             <div class="col-md-6">
                 <div class="p-4 bg-white border">
                     <h5>System Configuration</h5>
 
-                    <!-- Add this CSS in the <head> section or a <style> tag -->
                     <style>
-                        .icon {
-                            width: 100px;      /* Increase icon size */
-                            margin-right: 15px; /* Increase space between the icon and radio button */
-                        }
-
-                        .form-check {
-                            margin-bottom: 20px; /* Optional: add spacing between each radio button group */
-                        }
+                        .icon { width: 100px; margin-right: 15px; }
+                        .form-check { margin-bottom: 20px; }
                     </style>
 
-                    <!-- Three Vertical Radio Buttons with Enlarged Icons and Increased Spacing -->
                     <div class="mb-4">
                         <div class="form-check d-flex align-items-center">
                             <input class="form-check-input me-2" type="radio" name="systemConfig" id="C-ON">
@@ -105,11 +105,10 @@
                         </div>
                     </div>
 
-                    <!-- Two Horizontal Toggles with Icons -->
                     <h5>Electrolyzer Type</h5>
                     <div class="d-flex justify-content-start mb-4">
                         <div class="form-check d-flex align-items-center me-3">
-                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="ALK" >
+                            <input class="form-check-input me-2" type="radio" name="electrolyzerType" id="ALK">
                             <label class="form-check-label" for="ALK"><small>ALK</small></label>
                         </div>
 
@@ -123,7 +122,6 @@
                     <h5>Parameters</h5>
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- Slider 1: Economic Input Boundaries -->
                             <div class="mb-3">
                                 <label for="ecoBounds" class="form-label">Economic Input Boundaries</label>
                                 <input type="range" class="form-range" min="25" max="100" step="25" id="ecoBounds" list="economicInputBoundaries">
@@ -136,8 +134,8 @@
                                 <div id="value1">Average</div>
                             </div>
                         </div>
+
                         <div class="col-md-6">
-                            <!-- Slider 2: Technology Performance -->
                             <div>
                                 <label for="techChoice" class="form-label">Technology Performance</label>
                                 <input type="range" class="form-range" min="0" max="100" step="50" id="techChoice" list="techPerformance">
@@ -151,47 +149,16 @@
                         </div>
                     </div>
 
-                    <!-- Switch: Repurposed, new -->
                     <div>
                         <hr>
                         <div class="row">
                             <div class="col-md-6">
                                 <h5>Distance</h5>
                                 <div class="mb-3">
-                                    <input
-                                        type="range"
-                                        class="form-range"
-                                        id="distBounds"
-                                        min="50"
-                                        max="300"
-                                        step="50">
-
+                                    <input type="range" class="form-range" id="distBounds" min="50" max="300" step="50">
                                     <div id="valued">100 km</div>
                                 </div>
                             </div>
-
-                            <script>
-                                const allowedValues = [50, 100, 200, 300];
-                                const slider = document.getElementById('distBounds');
-                                const output = document.getElementById('valued');
-
-                                // Snap to closest allowed value
-                                slider.addEventListener('input', function () {
-                                    let val = parseInt(this.value);
-
-                                    // Snap to allowed values only
-                                    let closest = allowedValues.reduce((prev, curr) =>
-                                        Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev
-                                    );
-
-                                    this.value = closest;
-                                    output.textContent = closest + ' km';
-                                });
-
-                                // Set initial value
-                                slider.value = 100;
-                                output.textContent = slider.value + ' km';
-                            </script>
 
                             <div class="col-md-6">
                                 <h5>Status</h5>
@@ -203,8 +170,25 @@
                                     </label>
                                 </div>
                             </div>
-
                         </div>
+
+                        <script>
+                            const allowedValues = [50, 100, 200, 300];
+                            const slider = document.getElementById('distBounds');
+                            const output = document.getElementById('valued');
+
+                            slider.addEventListener('input', function () {
+                                let val = parseInt(this.value);
+                                let closest = allowedValues.reduce((prev, curr) =>
+                                    Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev
+                                );
+                                this.value = closest;
+                                output.textContent = closest + ' km';
+                            });
+
+                            slider.value = 100;
+                            output.textContent = slider.value + ' km';
+                        </script>
 
                         <script>
                             document.getElementById("flexSwitchCheckDefault").addEventListener("change", function() {
@@ -214,13 +198,11 @@
                                 if (this.checked) {
                                     newText.style.fontWeight = "normal";
                                     newText.style.color = "lightgray";
-
                                     repurposedText.style.fontWeight = "bold";
                                     repurposedText.style.color = "black";
                                 } else {
                                     newText.style.fontWeight = "bold";
                                     newText.style.color = "black";
-
                                     repurposedText.style.fontWeight = "normal";
                                     repurposedText.style.color = "lightgray";
                                 }
@@ -228,63 +210,43 @@
                         </script>
 
                         <script>
-                            // Wait until the DOM is fully loaded
                             document.addEventListener('DOMContentLoaded', function() {
-                                // Get the slider and display elements by their IDs
                                 const slider = document.getElementById('distBounds');
                                 const display = document.getElementById('valued');
-
-                                // Update display initially (in case the slider's default value isn't the same as the displayed value)
                                 display.textContent = slider.value + ' km';
-
-                                // Listen for the slider input event and update the display
                                 slider.addEventListener('input', function() {
                                     display.textContent = slider.value + ' km';
                                 });
                             });
                         </script>
                     </div>
-                    <div></div>
                 </div>
             </div>
 
             <script>
                 const slider1 = document.getElementById('ecoBounds');
                 const value1 = document.getElementById('value1');
-
-                const labels = {
-                    25: "Pessimistic",
-                    50: "Average",
-                    75: "Optimistic",
-                    100: "Expert Validated"
-                };
+                const labels = { 25: "Pessimistic", 50: "Average", 75: "Optimistic", 100: "Expert Validated" };
 
                 slider1.addEventListener('input', function() {
                     value1.textContent = labels[slider1.value] || "Unknown";
                 });
 
-                // Set the initial value correctly
                 slider1.value = 50;
                 value1.textContent = labels[50];
 
-                // Update Transmission Losses value
                 const slider2 = document.getElementById('techChoice');
                 const value2 = document.getElementById('value2');
                 slider2.addEventListener('input', function() {
-                    if (slider2.value == 0) {
-                        value2.textContent = 'Pessimistic';
-                    } else if (slider2.value == 50) {
-                        value2.textContent = 'Average';
-                    } else {
-                        value2.textContent = 'Optimistic';
-                    }
+                    if (slider2.value == 0) value2.textContent = 'Pessimistic';
+                    else if (slider2.value == 50) value2.textContent = 'Average';
+                    else value2.textContent = 'Optimistic';
                 });
             </script>
 
-            <!-- Right Column with OpenLayers Map -->
+            <!-- Right -->
             <div class="col-md-6">
                 <div class="p-4 bg-light border">
-                    <!-- Map Container -->
                     <div id="map"></div>
                 </div>
             </div>
@@ -297,70 +259,92 @@
     <section class="container my-5">
         <div class="p-4 bg-gray text-dark text-center">
             <h2>Scenarios Section</h2>
+
             <div id="textforuser">
                 <p>Click to explore scenarios...</p>
-                <!-- Explore Scenario Button -->
             </div>
             <button onclick="FirstDataQuery()" id="load-db" class="btn btn-primary">Explore Scenario</button>
 
-            <!-- Row for Side-by-Side Charts and Tables -->
-            <div class="row justify-content-center">
-                <!-- Histogram Chart and Table Side by Side -->
+            <!-- Charts row is hidden by default; becomes visible after first chart render -->
+            <div class="row justify-content-center" id="charts-row">
                 <div class="col-md-6 d-flex justify-content-center">
-                    <!-- Histogram Chart -->
-                    <div class="me-4">
-                        <h5 class="text-white">Histogram Chart</h5>
+                    <div class="me-4 w-100" style="max-width: 560px;">
+                        <div class="chart-header">
+                            <h5 class="text-white mb-0">Histogram Chart</h5>
+                            <button
+                                class="expand-btn"
+                                type="button"
+                                title="Expand to fullscreen"
+                                aria-label="Expand histogram chart"
+                                data-expand-target="histogramChart"
+                                data-expand-title="Histogram Chart">
+                                <i class="fa-solid fa-expand"></i>
+                            </button>
+                        </div>
                         <canvas id="histogramChart" class="small-chart"></canvas>
                     </div>
                 </div>
 
-                <!-- Pie Chart and Table Side by Side -->
                 <div class="col-md-6 d-flex justify-content-center">
-                    <!-- Pie Chart -->
-                    <div class="me-3">
-                        <h5 class="text-white">Pie Chart</h5>
+                    <div class="me-3 w-100" style="max-width: 560px;">
+                        <div class="chart-header">
+                            <h5 class="text-white mb-0">Pie Chart</h5>
+                            <button
+                                class="expand-btn"
+                                type="button"
+                                title="Expand to fullscreen"
+                                aria-label="Expand pie chart"
+                                data-expand-target="pieChart"
+                                data-expand-title="Pie Chart">
+                                <i class="fa-solid fa-expand"></i>
+                            </button>
+                        </div>
                         <canvas id="pieChart" class="small-chart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- DOWNLOAD WHOLE DATASET BUTTON (at the very end of the page content) -->
+        <!-- DOWNLOAD -->
         <div class="download-wrap d-flex justify-content-center">
-            <button id="download-dataset" class="btn btn-outline-primary">
-                Download whole dataset
-            </button>
+            <button id="download-dataset" class="btn btn-outline-primary">Download whole dataset</button>
         </div>
     </section>
 
+    <!-- FULLSCREEN CHART MODAL -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-chart-wrap">
+                        <canvas id="modalChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let isFirstQuery = true; // Initialize the first query
+        let isFirstQuery = true;
 
         function FirstDataQuery() {
-            // First, validate required selections without modifying the UI
             const systemConfig = checkConfigSelection("systemConfig");
-            if (!systemConfig) {
-                if (isFirstQuery) alert("Please select a System Configuration.");
-                return; // Exit early without hiding the button
-            }
+            if (!systemConfig) return;
 
             const technologySelectedOption = checkConfigSelection("electrolyzerType");
-            if (!technologySelectedOption) {
-                if (isFirstQuery) alert("Please select an Electrolyzer Type.");
-                return; // Exit early without hiding the button
-            }
+            if (!technologySelectedOption) return;
 
-            // If we reach here, all required inputs have been set.
-            // Now hide the button and update the text for subsequent changes.
             document.getElementById("load-db").hidden = true;
             document.getElementById("textforuser").innerHTML = "Change input to update charts...";
 
-            // Retrieve other parameter values
             const { economicInputBoundaries, techPerformance } = getSliderValues();
             const switchSelection = checkSwitchSelection();
             const distanceSelection = checkDistanceSelection();
 
-            // Proceed with fetching and rendering the charts
             readDatabase(
                 systemConfig.id,
                 technologySelectedOption.id,
@@ -371,8 +355,6 @@
             );
 
             gisMap(distanceSelection);
-
-            // Set flag to denote that the first query has run successfully
             isFirstQuery = false;
         }
 
@@ -381,134 +363,89 @@
             const radioSelectionName = {"systemConfig": "System Configuration", "electrolyzerType": "Electrolyzer Type"};
             if (!selectedOption) {
                 alert(`Please select a ${radioSelectionName[radioSelection]}.`);
-                return false; // Stop execution
+                return false;
             }
-            return selectedOption; // Proceed if valid
+            return selectedOption;
         }
 
         function getSliderValues() {
             const slider1 = document.getElementById('ecoBounds');
             const slider2 = document.getElementById('techChoice');
-
-            if (!slider1 || !slider2) {
-                console.error("One or both sliders not found.");
-                return;
-            }
+            if (!slider1 || !slider2) return {};
 
             const value1 = slider1.value;
             const value2 = slider2.value;
 
-            const economicInputBoundaries = value1 == 25 ? 'LB' :
+            const economicInputBoundaries =
+                value1 == 25 ? 'LB' :
                 value1 == 50 ? 'avg' :
                 value1 == 75 ? 'HB' :
                 'res';
 
             const techPerformance = value2 == 0 ? 'pes' : (value2 == 50 ? 'avg' : 'opt');
-
             return { economicInputBoundaries, techPerformance };
         }
 
         function checkSwitchSelection() {
             const switchInput = document.getElementById("flexSwitchCheckDefault");
-            if (!switchInput) {
-                console.error("Switch element not found!");
-                return;
-            }
-
-            const switchSelection = switchInput.checked ? "0" : "1";
-            return switchSelection;
+            if (!switchInput) return "1";
+            return switchInput.checked ? "0" : "1";
         }
 
         function checkDistanceSelection() {
             const DistInput = document.getElementById("distBounds");
-            if (!DistInput) {
-                console.error("Distance element not found!");
-                return;
-            }
-
-            const DistanceSelection = DistInput.value;
-            return DistanceSelection;
+            if (!DistInput) return "100";
+            return DistInput.value;
         }
 
-        // ----------------------SQLite Database Queries--------------------------------------
-
+        // ---------------------- DB ----------------------
         async function readDatabase(systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection) {
-            console.log(systemConfig);
-            console.log(electrolyzerType);
-            console.log(economicInputBoundaries);
-            console.log(techPerformance);
-            console.log(switchSelection);
-            console.log(distanceSelection);
+            const dbPath = "database/h2-scenarios.sqlite";
 
-            const dbPath = "database/h2-scenarios.sqlite"; // Path to database
-
-            console.log("Initializing sql.js...");
             try {
                 const SQL = await initSqlJs({
                     locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
                 });
-                console.log("sql.js loaded successfully.");
 
-                console.log(`Fetching database from: ${dbPath}`);
                 const response = await fetch(dbPath);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch database: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Failed to fetch database: ${response.statusText}`);
                 const buffer = await response.arrayBuffer();
-                console.log("Database file loaded successfully.");
-
-                // Load the database
                 const db = new SQL.Database(new Uint8Array(buffer));
-                console.log("Database initialized.");
 
-                // Query 1: Fetch all records from time_dep_costs with dynamic parameters
                 const stmt1 = db.prepare(
                     `SELECT year, CAPEX, OeM FROM time_dep_costs
                      WHERE sysconfig = ?
-                     AND technology = ?
-                     AND distance = ?
-                     AND bound_eco = ?
-                     AND bound_tech = ?
-                     AND rep_pipe = ?;`
+                       AND technology = ?
+                       AND distance = ?
+                       AND bound_eco = ?
+                       AND bound_tech = ?
+                       AND rep_pipe = ?;`
                 );
-
                 stmt1.bind([systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection]);
 
                 let systemCostsArray = [];
-                while (stmt1.step()) {
-                    systemCostsArray.push(stmt1.getAsObject());
-                }
+                while (stmt1.step()) systemCostsArray.push(stmt1.getAsObject());
                 stmt1.free();
 
-                console.log("System Costs:", systemCostsArray);
-
-                // Query 2: Fetch LCOH breakdown with dynamically bound parameters
                 const stmt2 = db.prepare(
                     `SELECT component_groups, SUM(LCOH_breakdown_percent) AS LCOH_percent
                      FROM system_costs
                      WHERE sysconfig = ?
-                     AND technology = ?
-                     AND distance = ?
-                     AND bound_eco = ?
-                     AND bound_tech = ?
-                     AND rep_pipe = ?
+                       AND technology = ?
+                       AND distance = ?
+                       AND bound_eco = ?
+                       AND bound_tech = ?
+                       AND rep_pipe = ?
                      GROUP BY component_groups
                      ORDER BY LCOH_percent DESC;`
                 );
-
                 stmt2.bind([systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection]);
 
                 let boundTechArray = [];
-                while (stmt2.step()) {
-                    boundTechArray.push(stmt2.getAsObject());
-                }
+                while (stmt2.step()) boundTechArray.push(stmt2.getAsObject());
                 stmt2.free();
 
-                console.log("Bound Tech Data:", boundTechArray);
-
-                // Close the database after execution
                 db.close();
-
                 generateSystemCostsChart(systemCostsArray, boundTechArray);
             } catch (error) {
                 console.error("Error loading database:", error);
@@ -516,33 +453,30 @@
             }
         }
 
-        // ----------------------------------------------------------------------------------
-
-        // Histogram (Bar Chart) Data ---------------------------------------------------
-
+        // ---------------------- Charts ----------------------
         let histogramChartInstance = null;
         let pieChartInstance = null;
 
-        function generateSystemCostsChart(systemCostsArray, boundTechArray) {
-            console.log("Start plot generation...");
+        // Modal chart instance + state
+        let modalChartInstance = null;
+        let lastExpanded = null;
 
-            // Find both canvases up front:
+        function generateSystemCostsChart(systemCostsArray, boundTechArray) {
+            // As soon as we are about to render charts, reveal the whole row (and expand buttons)
+            const chartsRow = document.getElementById('charts-row');
+            if (chartsRow) chartsRow.style.display = 'flex';
+
             const histogramCanvas = document.getElementById('histogramChart');
-            const pieCanvas      = document.getElementById('pieChart');
-            if (!histogramCanvas || !pieCanvas) {
-                console.error("Expected canvas elements not found!");
-                return;
-            }
+            const pieCanvas = document.getElementById('pieChart');
+            if (!histogramCanvas || !pieCanvas) return;
 
             const histogramCtx = histogramCanvas.getContext('2d');
-            const pieCtx       = pieCanvas.getContext('2d');
-
-            // --------------------- SYSTEM COSTS (CAPEX & O&M) BAR CHART ---------------------
+            const pieCtx = pieCanvas.getContext('2d');
 
             if (systemCostsArray.length > 0) {
-                const years     = systemCostsArray.map(entry => entry.year);
-                const capexData = systemCostsArray.map(entry => entry.CAPEX);
-                const oemData   = systemCostsArray.map(entry => entry.OeM);
+                const years = systemCostsArray.map(e => e.year);
+                const capexData = systemCostsArray.map(e => e.CAPEX);
+                const oemData = systemCostsArray.map(e => e.OeM);
 
                 if (histogramChartInstance) {
                     histogramChartInstance.data.labels = years;
@@ -550,7 +484,7 @@
                     histogramChartInstance.data.datasets[1].data = oemData;
                     histogramChartInstance.update();
                 } else {
-                    histogramCanvas.width  = 500;
+                    histogramCanvas.width = 500;
                     histogramCanvas.height = 300;
 
                     histogramChartInstance = new Chart(histogramCtx, {
@@ -558,18 +492,8 @@
                         data: {
                             labels: years,
                             datasets: [
-                                {
-                                    label: 'CAPEX',
-                                    data: capexData,
-                                    backgroundColor: '#FF6384',
-                                    yAxisID: 'y'
-                                },
-                                {
-                                    label: 'O&M',
-                                    data: oemData,
-                                    backgroundColor: '#36A2EB',
-                                    yAxisID: 'y1'
-                                }
+                                { label: 'CAPEX', data: capexData, backgroundColor: '#FF6384', yAxisID: 'y' },
+                                { label: 'O&M', data: oemData, backgroundColor: '#36A2EB', yAxisID: 'y1' }
                             ]
                         },
                         options: {
@@ -582,35 +506,18 @@
                             responsive: true,
                             scales: {
                                 x: { stacked: false },
-                                y: {
-                                    type: 'linear',
-                                    position: 'left',
-                                    title: { display: true, text: 'CAPEX' }
-                                },
-                                y1: {
-                                    type: 'linear',
-                                    position: 'right',
-                                    title: { display: true, text: 'O&M' },
-                                    grid: { drawOnChartArea: false }
-                                }
+                                y: { type: 'linear', position: 'left', title: { display: true, text: 'CAPEX' } },
+                                y1: { type: 'linear', position: 'right', title: { display: true, text: 'O&M' }, grid: { drawOnChartArea: false } }
                             }
                         }
                     });
                 }
-            } else {
-                console.error("System costs array is empty, cannot generate bar chart.");
             }
 
-            // -------------- LCOH BREAKDOWN BY COMPONENT (VERTICAL BAR) ------------------
-
             if (boundTechArray.length > 0) {
-                const componentLabels = boundTechArray.map(entry => entry.component_groups);
-                const lcohData        = boundTechArray.map(entry => entry.LCOH_percent);
-                const barColors       = [
-                    '#FF6384', '#36A2EB', '#FFCE56',
-                    '#4BC0C0', '#9966FF', '#8B0000',
-                    '#00C49F', '#FF9F40', '#8A2BE2'
-                ];
+                const componentLabels = boundTechArray.map(e => e.component_groups);
+                const lcohData = boundTechArray.map(e => e.LCOH_percent);
+                const barColors = ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#8B0000','#00C49F','#FF9F40','#8A2BE2'];
 
                 if (pieChartInstance) {
                     pieChartInstance.data.labels = componentLabels;
@@ -618,18 +525,14 @@
                     pieChartInstance.data.datasets[0].backgroundColor = barColors.slice(0, lcohData.length);
                     pieChartInstance.update();
                 } else {
-                    pieCanvas.width  = 400;
+                    pieCanvas.width = 400;
                     pieCanvas.height = 400;
 
                     pieChartInstance = new Chart(pieCtx, {
                         type: 'bar',
                         data: {
                             labels: componentLabels,
-                            datasets: [{
-                                label: 'LCOH Breakdown (%)',
-                                data: lcohData,
-                                backgroundColor: barColors.slice(0, lcohData.length)
-                            }]
+                            datasets: [{ label: 'LCOH Breakdown (%)', data: lcohData, backgroundColor: barColors.slice(0, lcohData.length) }]
                         },
                         options: {
                             animation: { duration: 500 },
@@ -640,23 +543,172 @@
                                 tooltip: { enabled: true }
                             },
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: { display: true, text: '% Contribution' }
-                                },
-                                x: {
-                                    title: { display: true, text: 'Component Group' }
-                                }
+                                y: { beginAtZero: true, title: { display: true, text: '% Contribution' } },
+                                x: { title: { display: true, text: 'Component Group' } }
                             }
                         }
                     });
                 }
-            } else {
-                console.error("Bound tech array is empty, cannot generate LCOH bar chart.");
+            }
+
+            // If modal is open and inputs changed, keep it synced
+            const chartModalEl = document.getElementById('chartModal');
+            const modalIsOpen = chartModalEl?.classList.contains('show');
+            if (modalIsOpen && lastExpanded) refreshModalChart();
+        }
+
+        // ---------------------- Fullscreen modal ----------------------
+        function getChartByCanvasId(canvasId) {
+            if (canvasId === 'histogramChart') return { instance: histogramChartInstance, kind: 'histogram' };
+            if (canvasId === 'pieChart') return { instance: pieChartInstance, kind: 'pie' };
+            return { instance: null, kind: null };
+        }
+
+        function cloneChartIntoModal(sourceCanvasId, title) {
+            const { instance, kind } = getChartByCanvasId(sourceCanvasId);
+            if (!instance) {
+                alert("Chart is not ready yet. Click 'Explore Scenario' first.");
+                return;
+            }
+
+            lastExpanded = { type: kind, sourceCanvasId };
+            document.getElementById('chartModalLabel').innerText = title || 'Chart';
+
+            if (modalChartInstance) {
+                modalChartInstance.destroy();
+                modalChartInstance = null;
+            }
+
+            const modalCanvas = document.getElementById('modalChartCanvas');
+            const modalCtx = modalCanvas.getContext('2d');
+
+            const dataClone = JSON.parse(JSON.stringify(instance.data));
+            const optionsClone = JSON.parse(JSON.stringify(instance.options || {}));
+            optionsClone.responsive = true;
+            optionsClone.maintainAspectRatio = false;
+
+            modalChartInstance = new Chart(modalCtx, {
+                type: instance.config.type,
+                data: dataClone,
+                options: optionsClone,
+                plugins: instance.config.plugins || []
+            });
+
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('chartModal'));
+            modal.show();
+
+            setTimeout(() => {
+                try { modalChartInstance.resize(); modalChartInstance.update(); } catch (e) {}
+            }, 50);
+        }
+
+        function refreshModalChart() {
+            if (!lastExpanded || !modalChartInstance) return;
+
+            const { instance } = getChartByCanvasId(lastExpanded.sourceCanvasId);
+            if (!instance) return;
+
+            modalChartInstance.data.labels = JSON.parse(JSON.stringify(instance.data.labels));
+            modalChartInstance.data.datasets = JSON.parse(JSON.stringify(instance.data.datasets));
+
+            const optionsClone = JSON.parse(JSON.stringify(instance.options || {}));
+            optionsClone.responsive = true;
+            optionsClone.maintainAspectRatio = false;
+            modalChartInstance.options = optionsClone;
+
+            modalChartInstance.update();
+        }
+
+        // ---------------------- Download dataset ----------------------
+        async function downloadWholeDatasetAsCSV() {
+            const btn = document.getElementById('download-dataset');
+            if (!btn) return;
+
+            const originalHTML = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Preparing download...
+            `;
+
+            const dbPath = "database/h2-scenarios.sqlite";
+
+            try {
+                const SQL = await initSqlJs({
+                    locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
+                });
+
+                const response = await fetch(dbPath);
+                if (!response.ok) throw new Error(`Failed to fetch database: ${response.statusText}`);
+                const buffer = await response.arrayBuffer();
+                const db = new SQL.Database(new Uint8Array(buffer));
+
+                const tablesRes = db.exec(`
+                    SELECT name
+                    FROM sqlite_master
+                    WHERE type='table'
+                      AND name NOT LIKE 'sqlite_%'
+                    ORDER BY name;
+                `);
+
+                const tableNames = (tablesRes[0]?.values || []).map(row => row[0]);
+                if (!tableNames.length) {
+                    db.close();
+                    throw new Error("No tables found in the database.");
+                }
+
+                let parts = [];
+                for (const tableName of tableNames) {
+                    const safeName = tableName.replace(/"/g, '""');
+                    const res = db.exec(`SELECT * FROM "${safeName}"`);
+
+                    parts.push(`### TABLE: ${tableName} ###\n`);
+
+                    if (!res.length) {
+                        parts.push("(empty)\n\n");
+                        continue;
+                    }
+
+                    const columns = res[0].columns;
+                    const rows = res[0].values;
+
+                    const escapeCSV = (value) => {
+                        if (value === null || value === undefined) return '';
+                        const s = String(value);
+                        if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+                        return s;
+                    };
+
+                    parts.push(columns.map(escapeCSV).join(',') + '\n');
+                    for (const row of rows) parts.push(row.map(escapeCSV).join(',') + '\n');
+                    parts.push('\n');
+                }
+
+                db.close();
+
+                const csvBlob = new Blob(parts, { type: "text/csv;charset=utf-8" });
+                const url = URL.createObjectURL(csvBlob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'h2-scenarios-full-dataset.csv';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            } catch (err) {
+                console.error("Dataset export failed:", err);
+                alert(`Dataset export failed: ${err.message}`);
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
             }
         }
 
-        // Helpers used in listeners below
+        // ---------------------- Listeners ----------------------
         function getLabelForEcoValue(v) {
             const m = { 25: "Pessimistic", 50: "Average", 75: "Optimistic", 100: "Expert Validated" };
             return m[v] || "Unknown";
@@ -666,56 +718,39 @@
             return m[v] || "Unknown";
         }
 
-        // Update values on change as required by the user -----------------------------------
         document.addEventListener("DOMContentLoaded", () => {
-            // System Configuration Radios
             document.querySelectorAll('input[name="systemConfig"]').forEach((radio) => {
-                radio.addEventListener('change', () => {
-                    if (!isFirstQuery) FirstDataQuery();
-                });
+                radio.addEventListener('change', () => { if (!isFirstQuery) FirstDataQuery(); });
             });
 
-            // Electrolyzer Type Radios
             document.querySelectorAll('input[name="electrolyzerType"]').forEach((radio) => {
-                radio.addEventListener('change', () => {
-                    if (!isFirstQuery) FirstDataQuery();
-                });
+                radio.addEventListener('change', () => { if (!isFirstQuery) FirstDataQuery(); });
             });
 
-            // Sliders: Economic Input Boundaries
             const ecoSlider = document.getElementById('ecoBounds');
             if (ecoSlider) {
                 ecoSlider.addEventListener('input', () => {
                     document.getElementById('value1').innerText = getLabelForEcoValue(ecoSlider.value);
                 });
-                ecoSlider.addEventListener('change', () => {
-                    if (!isFirstQuery) FirstDataQuery();
-                });
+                ecoSlider.addEventListener('change', () => { if (!isFirstQuery) FirstDataQuery(); });
             }
 
-            // Sliders: Technology Performance
             const techSlider = document.getElementById('techChoice');
             if (techSlider) {
                 techSlider.addEventListener('input', () => {
                     document.getElementById('value2').innerText = getLabelForTechValue(techSlider.value);
                 });
-                techSlider.addEventListener('change', () => {
-                    if (!isFirstQuery) FirstDataQuery();
-                });
+                techSlider.addEventListener('change', () => { if (!isFirstQuery) FirstDataQuery(); });
             }
 
-            // Distance Slider
             const distSlider = document.getElementById('distBounds');
             if (distSlider) {
                 distSlider.addEventListener('input', () => {
                     document.getElementById('valued').innerText = `${distSlider.value} km`;
                 });
-                distSlider.addEventListener('change', () => {
-                    if (!isFirstQuery) FirstDataQuery();
-                });
+                distSlider.addEventListener('change', () => { if (!isFirstQuery) FirstDataQuery(); });
             }
 
-            // Switch Toggle
             const switchInput = document.getElementById('flexSwitchCheckDefault');
             if (switchInput) {
                 switchInput.addEventListener('change', () => {
@@ -732,141 +767,44 @@
                 });
             }
 
-            // Hook up the "download whole dataset" button
             const downloadBtn = document.getElementById('download-dataset');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', downloadWholeDatasetAsCSV);
-            }
-        });
+            if (downloadBtn) downloadBtn.addEventListener('click', downloadWholeDatasetAsCSV);
 
-        // ---------------------- DOWNLOAD WHOLE DATASET AS CSV ----------------------
+            // Expand buttons (they are hidden initially because #charts-row is hidden)
+            document.querySelectorAll('[data-expand-target]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-expand-target');
+                    const title = btn.getAttribute('data-expand-title') || 'Chart';
+                    cloneChartIntoModal(targetId, title);
+                });
+            });
 
-        /**
-         * Exports ALL tables in the sqlite database into a single CSV file.
-         * Each table is preceded by a header line:
-         *   ### TABLE: table_name ###
-         * Then a standard CSV header row + rows.
-         *
-         * This avoids needing to know table names ahead of time, and truly exports the "whole dataset".
-         */
-        async function downloadWholeDatasetAsCSV() {
-            const btn = document.getElementById('download-dataset');
-            if (!btn) return;
-
-            const originalHTML = btn.innerHTML;
-
-            // Freeze button + show loader
-            btn.disabled = true;
-            btn.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Preparing download...
-            `;
-
-            const dbPath = "database/h2-scenarios.sqlite";
-
-            try {
-                const SQL = await initSqlJs({
-                    locateFile: fileName => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${fileName}`
+            const chartModalEl = document.getElementById('chartModal');
+            if (chartModalEl) {
+                chartModalEl.addEventListener('shown.bs.modal', () => {
+                    if (modalChartInstance) {
+                        try { modalChartInstance.resize(); modalChartInstance.update(); } catch (e) {}
+                    }
                 });
 
-                const response = await fetch(dbPath);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch database: ${response.statusText}`);
-                }
-                const buffer = await response.arrayBuffer();
-                const db = new SQL.Database(new Uint8Array(buffer));
-
-                // Get all user tables (exclude sqlite internal tables)
-                const tablesRes = db.exec(`
-                    SELECT name
-                    FROM sqlite_master
-                    WHERE type='table'
-                      AND name NOT LIKE 'sqlite_%'
-                    ORDER BY name;
-                `);
-
-                const tableNames = (tablesRes[0]?.values || []).map(row => row[0]);
-
-                if (!tableNames.length) {
-                    db.close();
-                    throw new Error("No tables found in the database.");
-                }
-
-                let parts = [];
-                for (const tableName of tableNames) {
-                    const res = db.exec(`SELECT * FROM "${tableName.replace(/"/g, '""')}"`);
-
-                    parts.push(`### TABLE: ${tableName} ###\n`);
-
-                    if (!res.length) {
-                        parts.push("(empty)\n\n");
-                        continue;
+                chartModalEl.addEventListener('hidden.bs.modal', () => {
+                    if (modalChartInstance) {
+                        modalChartInstance.destroy();
+                        modalChartInstance = null;
                     }
-
-                    const columns = res[0].columns;
-                    const rows = res[0].values;
-
-                    // CSV helpers
-                    const escapeCSV = (value) => {
-                        if (value === null || value === undefined) return '';
-                        const s = String(value);
-                        // Quote if it contains comma, quote, or newline
-                        if (/[",\n\r]/.test(s)) {
-                            return `"${s.replace(/"/g, '""')}"`;
-                        }
-                        return s;
-                    };
-
-                    // Header
-                    parts.push(columns.map(escapeCSV).join(',') + '\n');
-
-                    // Rows
-                    for (const row of rows) {
-                        parts.push(row.map(escapeCSV).join(',') + '\n');
-                    }
-
-                    parts.push('\n'); // blank line between tables
-                }
-
-                db.close();
-
-                const csvBlob = new Blob(parts, { type: "text/csv;charset=utf-8" });
-                const url = URL.createObjectURL(csvBlob);
-
-                // Trigger download
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'h2-scenarios-full-dataset.csv';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-
-                // Cleanup object URL
-                URL.revokeObjectURL(url);
-
-                // Restore button
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            } catch (err) {
-                console.error("Dataset export failed:", err);
-                alert(`Dataset export failed: ${err.message}`);
-
-                // Restore button on error
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                    lastExpanded = null;
+                });
             }
-        }
+        });
     </script>
-
-    <!-- Add Font Awesome CDN in the <head> section if not already included -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Footer -->
     <footer class="text-white text-center py-3" style="background-color: #FFB213;">
         <p>
-            &copy; <small>2025 H<sub>2</sub> Scenario Explorer. Powered by NL eScience Center, Amsterdam. <br>Promoted by Delft Universtity of Technology, Delft | Funded by Dutch Research Council (NWO) | Project Number ESI.2019.003 - <a href="https://ispt.eu/projects/hychain/" target="_blank"> HyChain</a></small>
+            &copy; <small>2025 H<sub>2</sub> Scenario Explorer. Powered by NL eScience Center, Amsterdam. <br>
+            Promoted by Delft Universtity of Technology, Delft | Funded by Dutch Research Council (NWO) |
+            Project Number ESI.2019.003 - <a href="https://ispt.eu/projects/hychain/" target="_blank"> HyChain</a></small>
         </p>
-        <!-- GitHub Icon Link -->
         <a href="https://github.com/ESI-FAR/h2-scenario-explorer" target="_blank" style="color: white; font-size: 20px; text-decoration: none;">
             <i class="fab fa-github"></i>
         </a>
@@ -874,10 +812,8 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- OpenLayers JS -->
     <script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
-
     <!-- Initialize OpenLayers Map -->
     <script src="script/map.js"></script>
 
