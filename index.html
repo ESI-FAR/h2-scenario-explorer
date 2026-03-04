@@ -445,8 +445,34 @@
                 while (stmt2.step()) boundTechArray.push(stmt2.getAsObject());
                 stmt2.free();
 
+                // NEW: fetch total LCOH in €/kg from simp_output_results (single value for the selected scenario)
+                // We'll use it to compute absolute contributions: (percent/100) * totalLCOH
+                let totalLCOH = null;
+                const stmt3 = db.prepare(
+                    `SELECT LCOH_Euro_per_kg
+                     FROM simp_output_results
+                     WHERE sysconfig = ?
+                       AND technology = ?
+                       AND distance = ?
+                       AND bound_eco = ?
+                       AND bound_tech = ?
+                       AND rep_pipe = ?
+                     LIMIT 1;`
+                );
+                stmt3.bind([systemConfig, electrolyzerType, distanceSelection, economicInputBoundaries, techPerformance, switchSelection]);
+
+                if (stmt3.step()) {
+                    const row = stmt3.getAsObject();
+                    // ensure numeric
+                    const v = row?.LCOH_Euro_per_kg;
+                    totalLCOH = (v === null || v === undefined) ? null : Number(v);
+                    if (Number.isNaN(totalLCOH)) totalLCOH = null;
+                }
+                stmt3.free();
+
                 db.close();
-                generateSystemCostsChart(systemCostsArray, boundTechArray);
+
+                generateSystemCostsChart(systemCostsArray, boundTechArray, totalLCOH);
             } catch (error) {
                 console.error("Error loading database:", error);
                 alert(`Failed to load the database: ${error.message}`);
@@ -461,7 +487,50 @@
         let modalChartInstance = null;
         let lastExpanded = null;
 
-        function generateSystemCostsChart(systemCostsArray, boundTechArray) {
+        // NEW: plugin to draw labels on the LCOH breakdown bar chart (percent + €/kg)
+        const lcohValueLabelsPlugin = {
+            id: 'lcohValueLabelsPlugin',
+            afterDatasetsDraw(chart, args, pluginOptions) {
+                const opts = pluginOptions || {};
+                if (!opts.enabled) return;
+
+                const datasetIndex = opts.datasetIndex ?? 0;
+                const totalLCOH = (opts.totalLCOH === null || opts.totalLCOH === undefined) ? null : Number(opts.totalLCOH);
+                const showEuro = !!(opts.showEuro && totalLCOH !== null && !Number.isNaN(totalLCOH));
+
+                const meta = chart.getDatasetMeta(datasetIndex);
+                if (!meta || meta.hidden) return;
+
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.font = '12px sans-serif';
+                ctx.fillStyle = '#111';
+
+                const data = chart.data?.datasets?.[datasetIndex]?.data || [];
+
+                meta.data.forEach((bar, i) => {
+                    const raw = data[i];
+                    const pct = Number(raw);
+                    if (!Number.isFinite(pct)) return;
+
+                    let label = `${pct.toFixed(1)}%`;
+                    if (showEuro) {
+                        const euro = (pct / 100) * totalLCOH;
+                        label = `${pct.toFixed(1)}% (${euro.toFixed(2)} €/kg)`;
+                    }
+
+                    // position slightly above the bar
+                    const pos = bar.tooltipPosition();
+                    ctx.fillText(label, pos.x, pos.y - 6);
+                });
+
+                ctx.restore();
+            }
+        };
+
+        function generateSystemCostsChart(systemCostsArray, boundTechArray, totalLCOH) {
             // As soon as we are about to render charts, reveal the whole row (and expand buttons)
             const chartsRow = document.getElementById('charts-row');
             if (chartsRow) chartsRow.style.display = 'flex';
@@ -516,13 +585,31 @@
 
             if (boundTechArray.length > 0) {
                 const componentLabels = boundTechArray.map(e => e.component_groups);
-                const lcohData = boundTechArray.map(e => e.LCOH_percent);
+                const lcohPctData = boundTechArray.map(e => Number(e.LCOH_percent));
                 const barColors = ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#8B0000','#00C49F','#FF9F40','#8A2BE2'];
+
+                const totalLCOHNum = (totalLCOH === null || totalLCOH === undefined) ? null : Number(totalLCOH);
+                const canShowEuro = (totalLCOHNum !== null && !Number.isNaN(totalLCOHNum));
+
+                const titleText = canShowEuro
+                    ? `LCOH Breakdown by Component Group (Total: ${totalLCOHNum.toFixed(2)} €/kg)`
+                    : 'LCOH Breakdown by Component Group';
 
                 if (pieChartInstance) {
                     pieChartInstance.data.labels = componentLabels;
-                    pieChartInstance.data.datasets[0].data = lcohData;
-                    pieChartInstance.data.datasets[0].backgroundColor = barColors.slice(0, lcohData.length);
+                    pieChartInstance.data.datasets[0].data = lcohPctData;
+                    pieChartInstance.data.datasets[0].backgroundColor = barColors.slice(0, lcohPctData.length);
+
+                    // keep plugin options updated so labels update too
+                    pieChartInstance.options.plugins.lcohValueLabelsPlugin = {
+                        enabled: true,
+                        datasetIndex: 0,
+                        totalLCOH: totalLCOHNum,
+                        showEuro: true
+                    };
+
+                    pieChartInstance.options.plugins.title.text = titleText;
+
                     pieChartInstance.update();
                 } else {
                     pieCanvas.width = 400;
@@ -532,21 +619,51 @@
                         type: 'bar',
                         data: {
                             labels: componentLabels,
-                            datasets: [{ label: 'LCOH Breakdown (%)', data: lcohData, backgroundColor: barColors.slice(0, lcohData.length) }]
+                            datasets: [{
+                                label: 'LCOH Breakdown (%)',
+                                data: lcohPctData,
+                                backgroundColor: barColors.slice(0, lcohPctData.length)
+                            }]
                         },
                         options: {
                             animation: { duration: 500 },
                             indexAxis: 'x',
                             plugins: {
-                                title: { display: true, text: 'LCOH Breakdown by Component Group' },
+                                title: { display: true, text: titleText },
                                 legend: { display: false },
-                                tooltip: { enabled: true }
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        // NEW: tooltip shows both percent and absolute €/kg (derived from total)
+                                        label: function(context) {
+                                            const pct = Number(context.parsed?.y);
+                                            if (!Number.isFinite(pct)) return '';
+
+                                            let s = `${pct.toFixed(2)}%`;
+                                            if (canShowEuro) {
+                                                const euro = (pct / 100) * totalLCOHNum;
+                                                s += ` (${euro.toFixed(3)} €/kg)`;
+                                            }
+                                            return s;
+                                        }
+                                    }
+                                },
+
+                                // NEW: custom plugin config (labels on top of bars)
+                                lcohValueLabelsPlugin: {
+                                    enabled: true,
+                                    datasetIndex: 0,
+                                    totalLCOH: totalLCOHNum,
+                                    showEuro: true
+                                }
                             },
+                            responsive: true,
                             scales: {
                                 y: { beginAtZero: true, title: { display: true, text: '% Contribution' } },
                                 x: { title: { display: true, text: 'Component Group' } }
                             }
-                        }
+                        },
+                        plugins: [lcohValueLabelsPlugin]
                     });
                 }
             }
