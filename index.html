@@ -487,49 +487,58 @@
         let modalChartInstance = null;
         let lastExpanded = null;
 
-        // NEW: plugin to draw labels on the LCOH breakdown bar chart (percent + €/kg)
+        // NEW: plugin to draw labels on the LCOH breakdown bar chart (percent on 1st line + €/kg on 2nd line)
         const lcohValueLabelsPlugin = {
-            id: 'lcohValueLabelsPlugin',
-            afterDatasetsDraw(chart, args, pluginOptions) {
-                const opts = pluginOptions || {};
-                if (!opts.enabled) return;
+        id: 'lcohValueLabelsPlugin',
+        afterDatasetsDraw(chart, args, pluginOptions) {
+            const opts = pluginOptions || {};
+            if (!opts.enabled) return;
 
-                const datasetIndex = opts.datasetIndex ?? 0;
-                const totalLCOH = (opts.totalLCOH === null || opts.totalLCOH === undefined) ? null : Number(opts.totalLCOH);
-                const showEuro = !!(opts.showEuro && totalLCOH !== null && !Number.isNaN(totalLCOH));
+            const datasetIndex = opts.datasetIndex ?? 0;
+            const totalLCOH = (opts.totalLCOH === null || opts.totalLCOH === undefined) ? null : Number(opts.totalLCOH);
+            const showEuro = !!(opts.showEuro && totalLCOH !== null && !Number.isNaN(totalLCOH));
 
-                const meta = chart.getDatasetMeta(datasetIndex);
-                if (!meta || meta.hidden) return;
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta || meta.hidden) return;
 
-                const ctx = chart.ctx;
-                ctx.save();
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.font = '12px sans-serif';
-                ctx.fillStyle = '#111';
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.font = '12px sans-serif';
+            ctx.fillStyle = '#111';
 
-                const data = chart.data?.datasets?.[datasetIndex]?.data || [];
+            const data = chart.data?.datasets?.[datasetIndex]?.data || [];
+            const lineGap = 14; // px gap between the two lines (tweak if needed)
 
-                meta.data.forEach((bar, i) => {
-                    const raw = data[i];
-                    const pct = Number(raw);
-                    if (!Number.isFinite(pct)) return;
+            meta.data.forEach((bar, i) => {
+            const raw = data[i];
+            const pct = Number(raw);
+            if (!Number.isFinite(pct)) return;
 
-                    let label = `${pct.toFixed(1)}%`;
-                    if (showEuro) {
-                        const euro = (pct / 100) * totalLCOH;
-                        label = `${pct.toFixed(1)}% (${euro.toFixed(2)} €/kg)`;
-                    }
+            const percentLine = `${pct.toFixed(1)}%`;
+            let euroLine = '';
 
-                    // position slightly above the bar
-                    const pos = bar.tooltipPosition();
-                    ctx.fillText(label, pos.x, pos.y - 6);
-                });
-
-                ctx.restore();
+            if (showEuro) {
+                const euro = (pct / 100) * totalLCOH;
+                euroLine = `(${euro.toFixed(2)} €/kg)`;
             }
-        };
 
+            const pos = bar.tooltipPosition();
+
+            // Draw percent ABOVE, and € value UNDER it (still above the bar)
+            // If euroLine is empty, only one line is drawn.
+            if (euroLine) {
+                ctx.fillText(percentLine, pos.x, pos.y - (lineGap + 2));
+                ctx.fillText(euroLine,   pos.x, pos.y - 2);
+            } else {
+                ctx.fillText(percentLine, pos.x, pos.y - 2);
+            }
+            });
+
+            ctx.restore();
+        }
+        };
         function generateSystemCostsChart(systemCostsArray, boundTechArray, totalLCOH) {
             // As soon as we are about to render charts, reveal the whole row (and expand buttons)
             const chartsRow = document.getElementById('charts-row');
