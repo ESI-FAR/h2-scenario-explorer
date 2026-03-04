@@ -2,7 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Authors + basic SEO -->
+    <meta name="author" content="Ermanno Lo Cascio &amp; Suvayu Ali, eScience Center, NL">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Browser UI / header color -->
+    <meta name="theme-color" content="#009DDD">
+    <meta name="msapplication-TileColor" content="#009DDD">
+    <!-- iOS Safari: limited control; still useful when added to homescreen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="site.webmanifest">
+
     <title>H2 scenario explorer</title>
 
     <!-- Bootstrap 5 CDN -->
@@ -445,8 +459,7 @@
                 while (stmt2.step()) boundTechArray.push(stmt2.getAsObject());
                 stmt2.free();
 
-                // NEW: fetch total LCOH in €/kg from simp_output_results (single value for the selected scenario)
-                // We'll use it to compute absolute contributions: (percent/100) * totalLCOH
+                // LCOH total (€/kg)
                 let totalLCOH = null;
                 const stmt3 = db.prepare(
                     `SELECT LCOH_Euro_per_kg
@@ -463,7 +476,6 @@
 
                 if (stmt3.step()) {
                     const row = stmt3.getAsObject();
-                    // ensure numeric
                     const v = row?.LCOH_Euro_per_kg;
                     totalLCOH = (v === null || v === undefined) ? null : Number(v);
                     if (Number.isNaN(totalLCOH)) totalLCOH = null;
@@ -471,7 +483,6 @@
                 stmt3.free();
 
                 db.close();
-
                 generateSystemCostsChart(systemCostsArray, boundTechArray, totalLCOH);
             } catch (error) {
                 console.error("Error loading database:", error);
@@ -487,60 +498,58 @@
         let modalChartInstance = null;
         let lastExpanded = null;
 
-        // NEW: plugin to draw labels on the LCOH breakdown bar chart (percent on 1st line + €/kg on 2nd line)
+        // Labels plugin: percent on first line, €/kg on second line
         const lcohValueLabelsPlugin = {
-        id: 'lcohValueLabelsPlugin',
-        afterDatasetsDraw(chart, args, pluginOptions) {
-            const opts = pluginOptions || {};
-            if (!opts.enabled) return;
+            id: 'lcohValueLabelsPlugin',
+            afterDatasetsDraw(chart, args, pluginOptions) {
+                const opts = pluginOptions || {};
+                if (!opts.enabled) return;
 
-            const datasetIndex = opts.datasetIndex ?? 0;
-            const totalLCOH = (opts.totalLCOH === null || opts.totalLCOH === undefined) ? null : Number(opts.totalLCOH);
-            const showEuro = !!(opts.showEuro && totalLCOH !== null && !Number.isNaN(totalLCOH));
+                const datasetIndex = opts.datasetIndex ?? 0;
+                const totalLCOH = (opts.totalLCOH === null || opts.totalLCOH === undefined) ? null : Number(opts.totalLCOH);
+                const showEuro = !!(opts.showEuro && totalLCOH !== null && !Number.isNaN(totalLCOH));
 
-            const meta = chart.getDatasetMeta(datasetIndex);
-            if (!meta || meta.hidden) return;
+                const meta = chart.getDatasetMeta(datasetIndex);
+                if (!meta || meta.hidden) return;
 
-            const ctx = chart.ctx;
-            ctx.save();
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.font = '12px sans-serif';
-            ctx.fillStyle = '#111';
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.font = '12px sans-serif';
+                ctx.fillStyle = '#111';
 
-            const data = chart.data?.datasets?.[datasetIndex]?.data || [];
-            const lineGap = 14; // px gap between the two lines (tweak if needed)
+                const data = chart.data?.datasets?.[datasetIndex]?.data || [];
+                const lineGap = 14;
 
-            meta.data.forEach((bar, i) => {
-            const raw = data[i];
-            const pct = Number(raw);
-            if (!Number.isFinite(pct)) return;
+                meta.data.forEach((bar, i) => {
+                    const raw = data[i];
+                    const pct = Number(raw);
+                    if (!Number.isFinite(pct)) return;
 
-            const percentLine = `${pct.toFixed(1)}%`;
-            let euroLine = '';
+                    const percentLine = `${pct.toFixed(1)}%`;
+                    let euroLine = '';
 
-            if (showEuro) {
-                const euro = (pct / 100) * totalLCOH;
-                euroLine = `(${euro.toFixed(2)} €/kg)`;
+                    if (showEuro) {
+                        const euro = (pct / 100) * totalLCOH;
+                        euroLine = `(${euro.toFixed(2)} €/kg)`;
+                    }
+
+                    const pos = bar.tooltipPosition();
+
+                    if (euroLine) {
+                        ctx.fillText(percentLine, pos.x, pos.y - (lineGap + 2));
+                        ctx.fillText(euroLine,   pos.x, pos.y - 2);
+                    } else {
+                        ctx.fillText(percentLine, pos.x, pos.y - 2);
+                    }
+                });
+
+                ctx.restore();
             }
-
-            const pos = bar.tooltipPosition();
-
-            // Draw percent ABOVE, and € value UNDER it (still above the bar)
-            // If euroLine is empty, only one line is drawn.
-            if (euroLine) {
-                ctx.fillText(percentLine, pos.x, pos.y - (lineGap + 2));
-                ctx.fillText(euroLine,   pos.x, pos.y - 2);
-            } else {
-                ctx.fillText(percentLine, pos.x, pos.y - 2);
-            }
-            });
-
-            ctx.restore();
-        }
         };
+
         function generateSystemCostsChart(systemCostsArray, boundTechArray, totalLCOH) {
-            // As soon as we are about to render charts, reveal the whole row (and expand buttons)
             const chartsRow = document.getElementById('charts-row');
             if (chartsRow) chartsRow.style.display = 'flex';
 
@@ -609,14 +618,12 @@
                     pieChartInstance.data.datasets[0].data = lcohPctData;
                     pieChartInstance.data.datasets[0].backgroundColor = barColors.slice(0, lcohPctData.length);
 
-                    // keep plugin options updated so labels update too
                     pieChartInstance.options.plugins.lcohValueLabelsPlugin = {
                         enabled: true,
                         datasetIndex: 0,
                         totalLCOH: totalLCOHNum,
                         showEuro: true
                     };
-
                     pieChartInstance.options.plugins.title.text = titleText;
 
                     pieChartInstance.update();
@@ -643,11 +650,9 @@
                                 tooltip: {
                                     enabled: true,
                                     callbacks: {
-                                        // NEW: tooltip shows both percent and absolute €/kg (derived from total)
                                         label: function(context) {
                                             const pct = Number(context.parsed?.y);
                                             if (!Number.isFinite(pct)) return '';
-
                                             let s = `${pct.toFixed(2)}%`;
                                             if (canShowEuro) {
                                                 const euro = (pct / 100) * totalLCOHNum;
@@ -657,8 +662,6 @@
                                         }
                                     }
                                 },
-
-                                // NEW: custom plugin config (labels on top of bars)
                                 lcohValueLabelsPlugin: {
                                     enabled: true,
                                     datasetIndex: 0,
@@ -677,7 +680,6 @@
                 }
             }
 
-            // If modal is open and inputs changed, keep it synced
             const chartModalEl = document.getElementById('chartModal');
             const modalIsOpen = chartModalEl?.classList.contains('show');
             if (modalIsOpen && lastExpanded) refreshModalChart();
@@ -896,7 +898,6 @@
             const downloadBtn = document.getElementById('download-dataset');
             if (downloadBtn) downloadBtn.addEventListener('click', downloadWholeDatasetAsCSV);
 
-            // Expand buttons (they are hidden initially because #charts-row is hidden)
             document.querySelectorAll('[data-expand-target]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetId = btn.getAttribute('data-expand-target');
